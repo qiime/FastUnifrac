@@ -10,255 +10,138 @@ __email__ = "josenavasmolina@gmail.com"
 __status__ = "Development"
 
 from cogent.util.unit_test import TestCase, main
-from qiime.util import load_qiime_config
-from os import path, mkdir
+from qiime.util import load_qiime_config, get_tmp_filename
+from os import mkdir
+from os.path import join, exists
 from shutil import rmtree
-from fastunifrac.make_pcoa_html import (get_link_indexes, get_kinemage_link, get_html_links,
-                                get_raw_pcoa_download_link, get_dict_links, get_html_table_links,
-                                get_html_string, make_html_file)
+from fastunifrac.make_pcoa_html import (get_dict_links, get_html_table_links,
+    get_html_string, make_html_file)
 
 class MakePcoaHtmlTest(TestCase):
     def setUp(self):
+        """Set up some test variables"""
+        # Get the temp folder
         self.qiime_config = load_qiime_config()
         self.tmp_dir = self.qiime_config['temp_dir'] or '/tmp/'
-        self.pcoa_dir = path.join(self.tmp_dir, 'pcoa_output')
-
-        self.dict_links = {0:"""<a class="table_cell" target="_blank" href="weighted_unifrac_2d_continuous/weighted_unifrac_pc_2D_PCoA_plots.html">View weighted unifrac 2d continuous coloring plots</a>""",
-            1:"""<a class="table_cell" target="_blank" href="weighted_unifrac_2d_discrete/weighted_unifrac_pc_2D_PCoA_plots.html">View weighted unifrac 2d discrete coloring plots</a>""",
-            2:"""<a class="table_cell" target="_blank" href="weighted_unifrac_3d_continuous/weighted_unifrac_pc_3D_PCoA_plots.html">View weighted unifrac 3d continuous coloring plots</a>""",
-            3:"""<a class="table_cell" target="_blank" href="weighted_unifrac_3d_discrete/weighted_unifrac_pc_3D_PCoA_plots.html">View weighted unifrac 3d discrete coloring plots</a>""",
-            4:"""<a class="table_cell" target="_blank" href="weighted_unifrac_pc.txt">Download raw PCoA data (Right click - Save as)</a>""",
-            5:"""<a class="table_cell" target="_blank" href="weighted_unifrac_3d_continuous/random_name/weighted_unifrac_pc.txt.kin">Download kinemage continuous coloring file (Right click - Save as)</a>""",
-            6:"""<a class="table_cell" target="_blank" href="weighted_unifrac_3d_discrete/random_name/weighted_unifrac_pc.txt.kin">Download kinemage discrete coloring file (Right click - Save as)</a>"""}
-
+        # Initialize some variables
+        self.dict_links = {
+            0:"""<a class="table_cell" target="_blank" href="weighted_unifrac_2d_continuous/weighted_unifrac_pc_2D_PCoA_plots.html">View 2d continuous coloring plots</a>""",
+            1:"""<a class="table_cell" target="_blank" href="weighted_unifrac_2d_discrete/weighted_unifrac_pc_2D_PCoA_plots.html">View 2d discrete coloring plots</a>""",
+            2:"""<a class="table_cell" target="_blank" href="index.html">View 3d plots</a>""",
+            3:"""<a class="table_cell" target="_blank" href="weighted_unifrac_pc.txt">Download raw PCoA data (Right click - Save as)</a>"""
+        }
         self._dirs_to_clean_up = []
 
     def tearDown(self):
+        """Cleans up the environment once the tests finish"""
         map(rmtree, self._dirs_to_clean_up)
 
     def _create_2d_directory(self, output_dir, name):
-        dir_path = path.join(output_dir, name)
+        """Creates the directory structure of the 2d plots"""
+        # Create base dir
+        dir_path = join(output_dir, name)
         mkdir(dir_path)
-
-        js_path = path.join(dir_path, 'js')
+        # Add the overlib.js file
+        js_path = join(dir_path, 'js')
         mkdir(js_path)
-        f = open(path.join(js_path, 'overlib.js'), 'w+')
+        f = open(join(js_path, 'overlib.js'), 'w')
         f.close()
-
-        random_path = path.join(dir_path, 'random_name')
+        # Add the directory with the plot images
+        random_path = get_tmp_filename(tmp_dir=dir_path, suffix='')
         mkdir(random_path)
-        f = open(path.join(random_path, 'PC1vsPC2.png'), 'w+')
+        f = open(join(random_path, 'PC1vsPC2.png'), 'w')
         f.close()
-
-        f = open(path.join(dir_path, 'weighted_unifrac_pc_2D_PCoA_plots.html'), 'w+')
-        f.close()
-
-    def _create_3d_directory(self, output_dir, name):
-        dir_path = path.join(output_dir, name)
-        mkdir(dir_path)
-
-        jar_path = path.join(dir_path, 'jar')
-        mkdir(jar_path)
-        f = open(path.join(jar_path, 'king.jar'), 'w+')
-
-        kin_dir = path.join(dir_path, 'random_name')
-        mkdir(kin_dir)
-        f = open(path.join(kin_dir, 'weighted_unifrac_pc.txt.kin'), 'w+')
-        f.close()
-
-        f = open(path.join(dir_path, 'weighted_unifrac_pc_3D_PCoA_plots.html'), 'w+')
+        # Add the html file
+        f = open(join(dir_path, 'weighted_unifrac_pc_2D_PCoA_plots.html'), 'w')
         f.close()
 
     def _create_pcoa_output_structure(self, output_dir):
+        """Creates the directory structure of the PCoA analysis"""
+        # Create base dir
         mkdir(output_dir)
+        # Create 2d plots structure for continuous and discrete coloring 
         self._create_2d_directory(output_dir, 'weighted_unifrac_2d_continuous')
         self._create_2d_directory(output_dir, 'weighted_unifrac_2d_discrete')
-        self._create_3d_directory(output_dir, 'weighted_unifrac_3d_continuous')
-        self._create_3d_directory(output_dir, 'weighted_unifrac_3d_discrete')
-
-        f = open(path.join(output_dir, 'log_3564.txt'), 'w+')
+        # Create the log file
+        f = open(get_tmp_filename(tmp_dir=output_dir, prefix='log_',
+            suffix='.txt'), 'w')
         f.close()
-        f = open(path.join(output_dir, 'prefs.txt'), 'w+')
+        # Create the prefs.txt file
+        f = open(join(output_dir, 'prefs.txt'), 'w')
         f.close()
-        f = open(path.join(output_dir, 'weighted_unifrac_dm.txt'), 'w+')
+        # Create the distance matrix file
+        f = open(join(output_dir, 'weighted_unifrac_dm.txt'), 'w')
         f.close()
-        f = open(path.join(output_dir, 'weighted_unifrac_pc.txt'), 'w+')
+        # Create the principal coordinate file
+        f = open(join(output_dir, 'weighted_unifrac_pc.txt'), 'w')
         f.close()
-
-    def test_get_link_indexes(self):
-        obs_a, obs_b = get_link_indexes('weighted_unifrac_2d_continuous')
-        exp_a = 0
-        exp_b = None
-        self.assertEqual(obs_a, exp_a)
-        self.assertEqual(obs_b, exp_b)
-
-        obs_a, obs_b = get_link_indexes('weighted_unifrac_2d_discrete')
-        exp_a = 1
-        exp_b = None
-        self.assertEqual(obs_a, exp_a)
-        self.assertEqual(obs_b, exp_b)
-
-        obs_a, obs_b = get_link_indexes('weighted_unifrac_3d_continuous')
-        exp_a = 2
-        exp_b = 5
-        self.assertEqual(obs_a, exp_a)
-        self.assertEqual(obs_b, exp_b)
-
-        obs_a, obs_b = get_link_indexes('weighted_unifrac_3d_discrete')
-        exp_a = 3
-        exp_b = 6
-        self.assertEqual(obs_a, exp_a)
-        self.assertEqual(obs_b, exp_b)
-
-        self.assertRaises(ValueError, get_link_indexes, 'weighted_unifrac_bad_discrete')
-        self.assertRaises(ValueError, get_link_indexes, 'weighted_unifrac_3d_bad')
-
-    def test_get_kinemage_link(self):
-        mkdir(self.pcoa_dir)
-        self._dirs_to_clean_up = [self.pcoa_dir]
-
-        name = 'weighted_unifrac_3d_discrete'
-        p = path.join(self.pcoa_dir, name)
-        index = 6
-        self._create_3d_directory(self.pcoa_dir, name)
-        obs = get_kinemage_link(p, name, index)
-        exp = """<a class="table_cell" target="_blank" href="weighted_unifrac_3d_discrete/random_name/weighted_unifrac_pc.txt.kin">Download kinemage discrete coloring file (Right click - Save as)</a>"""
-        self.assertEqual(obs, exp)
-
-        name = 'weighted_unifrac_3d_continuous'
-        p = path.join(self.pcoa_dir, name)
-        index = 5
-        self._create_3d_directory(self.pcoa_dir, name)
-        obs = get_kinemage_link(p, name, index)
-        exp = """<a class="table_cell" target="_blank" href="weighted_unifrac_3d_continuous/random_name/weighted_unifrac_pc.txt.kin">Download kinemage continuous coloring file (Right click - Save as)</a>"""
-        self.assertEqual(obs, exp)
-
-        self.assertRaises(ValueError, get_kinemage_link, p, name, 3)
-
-        name = 'weighted_unifrac_2d_discrete'
-        p = path.join(self.pcoa_dir, name)
-        self._create_2d_directory(self.pcoa_dir, name)
-        self.assertRaises(ValueError, get_kinemage_link, p, name, 5)
-
-    def test_get_html_links(self):
-        mkdir(self.pcoa_dir)
-        self._dirs_to_clean_up = [self.pcoa_dir]
-
-        name = 'weighted_unifrac_3d_discrete'
-        p = path.join(self.pcoa_dir, name)
-        self._create_3d_directory(self.pcoa_dir, name)
-        obs_vi, obs_vl, obs_di, obs_dl = get_html_links(p, name)
-        exp_vi = 3
-        exp_vl = """<a class="table_cell" target="_blank" href="weighted_unifrac_3d_discrete/weighted_unifrac_pc_3D_PCoA_plots.html">View weighted unifrac 3d discrete coloring plots</a>"""
-        exp_di = 6
-        exp_dl = """<a class="table_cell" target="_blank" href="weighted_unifrac_3d_discrete/random_name/weighted_unifrac_pc.txt.kin">Download kinemage discrete coloring file (Right click - Save as)</a>"""
-        self.assertEqual(obs_vi, exp_vi)
-        self.assertEqual(obs_vl, exp_vl)
-        self.assertEqual(obs_di, exp_di)
-        self.assertEqual(obs_dl, exp_dl)
-
-        name = 'weighted_unifrac_3d_continuous'
-        p = path.join(self.pcoa_dir, name)
-        self._create_3d_directory(self.pcoa_dir, name)
-        obs_vi, obs_vl, obs_di, obs_dl = get_html_links(p, name)
-        exp_vi = 2
-        exp_vl = """<a class="table_cell" target="_blank" href="weighted_unifrac_3d_continuous/weighted_unifrac_pc_3D_PCoA_plots.html">View weighted unifrac 3d continuous coloring plots</a>"""
-        exp_di = 5
-        exp_dl = """<a class="table_cell" target="_blank" href="weighted_unifrac_3d_continuous/random_name/weighted_unifrac_pc.txt.kin">Download kinemage continuous coloring file (Right click - Save as)</a>"""
-        self.assertEqual(obs_vi, exp_vi)
-        self.assertEqual(obs_vl, exp_vl)
-        self.assertEqual(obs_di, exp_di)
-        self.assertEqual(obs_dl, exp_dl)
-
-        name = 'weighted_unifrac_2d_discrete'
-        p = path.join(self.pcoa_dir, name)
-        self._create_2d_directory(self.pcoa_dir, name)
-        obs_vi, obs_vl, obs_di, obs_dl = get_html_links(p, name)
-        exp_vi = 1
-        exp_vl = """<a class="table_cell" target="_blank" href="weighted_unifrac_2d_discrete/weighted_unifrac_pc_2D_PCoA_plots.html">View weighted unifrac 2d discrete coloring plots</a>"""
-        exp_di = None
-        exp_dl = None
-        self.assertEqual(obs_vi, exp_vi)
-        self.assertEqual(obs_vl, exp_vl)
-        self.assertEqual(obs_di, exp_di)
-        self.assertEqual(obs_dl, exp_dl)
-
-        name = 'weighted_unifrac_2d_continuous'
-        p = path.join(self.pcoa_dir, name)
-        self._create_2d_directory(self.pcoa_dir, name)
-        obs_vi, obs_vl, obs_di, obs_dl = get_html_links(p, name)
-        exp_vi = 0
-        exp_vl = """<a class="table_cell" target="_blank" href="weighted_unifrac_2d_continuous/weighted_unifrac_pc_2D_PCoA_plots.html">View weighted unifrac 2d continuous coloring plots</a>"""
-        exp_di = None
-        exp_dl = None
-        self.assertEqual(obs_vi, exp_vi)
-        self.assertEqual(obs_vl, exp_vl)
-        self.assertEqual(obs_di, exp_di)
-        self.assertEqual(obs_dl, exp_dl)
-
-    def test_get_raw_pcoa_download_link(self):
-        mkdir(self.pcoa_dir)
-        self._dirs_to_clean_up = [self.pcoa_dir]
-
-        name = 'weighted_unifrac_pc.txt'
-        p = path.join(self.pcoa_dir, name)
-        f = open(p, 'w+')
+        # Create the index.html file from Emperor
+        f = open(join(output_dir, 'index.html'), 'w')
         f.close()
-
-        obs = get_raw_pcoa_download_link(p, name)
-        exp = """<a class="table_cell" target="_blank" href="weighted_unifrac_pc.txt">Download raw PCoA data (Right click - Save as)</a>"""
-        self.assertEqual(obs, exp)
+        # Create the 'emperor_required_resources' folder
+        mkdir(join(output_dir, 'emperor_required_resources'))
 
     def test_get_dict_links(self):
-        self._create_pcoa_output_structure(self.pcoa_dir)
-        self._dirs_to_clean_up = [self.pcoa_dir]
-
-        obs = get_dict_links(self.pcoa_dir)
-        exp = {0:"""<a class="table_cell" target="_blank" href="weighted_unifrac_2d_continuous/weighted_unifrac_pc_2D_PCoA_plots.html">View weighted unifrac 2d continuous coloring plots</a>""",
-            1:"""<a class="table_cell" target="_blank" href="weighted_unifrac_2d_discrete/weighted_unifrac_pc_2D_PCoA_plots.html">View weighted unifrac 2d discrete coloring plots</a>""",
-            2:"""<a class="table_cell" target="_blank" href="weighted_unifrac_3d_continuous/weighted_unifrac_pc_3D_PCoA_plots.html">View weighted unifrac 3d continuous coloring plots</a>""",
-            3:"""<a class="table_cell" target="_blank" href="weighted_unifrac_3d_discrete/weighted_unifrac_pc_3D_PCoA_plots.html">View weighted unifrac 3d discrete coloring plots</a>""",
-            4:"""<a class="table_cell" target="_blank" href="weighted_unifrac_pc.txt">Download raw PCoA data (Right click - Save as)</a>""",
-            5:"""<a class="table_cell" target="_blank" href="weighted_unifrac_3d_continuous/random_name/weighted_unifrac_pc.txt.kin">Download kinemage continuous coloring file (Right click - Save as)</a>""",
-            6:"""<a class="table_cell" target="_blank" href="weighted_unifrac_3d_discrete/random_name/weighted_unifrac_pc.txt.kin">Download kinemage discrete coloring file (Right click - Save as)</a>"""}
-
-        self.assertEqual(obs, exp)
+        """The links dict is retrieved correctly"""
+        # Generate the PCoA output directory structure
+        pcoa_dir = get_tmp_filename(tmp_dir=self.tmp_dir, suffix='')
+        self._create_pcoa_output_structure(pcoa_dir)
+        # Add the PCoA output to the cleaning paths
+        self._dirs_to_clean_up = [pcoa_dir]
+        # Perform the test 
+        obs_links, obs_title = get_dict_links(pcoa_dir)
+        exp_links = {
+            0:"""<a class="table_cell" target="_blank" href="weighted_unifrac_2d_continuous/weighted_unifrac_pc_2D_PCoA_plots.html">View 2d continuous coloring plots</a>""",
+            1:"""<a class="table_cell" target="_blank" href="weighted_unifrac_2d_discrete/weighted_unifrac_pc_2D_PCoA_plots.html">View 2d discrete coloring plots</a>""",
+            2:"""<a class="table_cell" target="_blank" href="index.html">View 3d plots</a>""",
+            3:"""<a class="table_cell" target="_blank" href="weighted_unifrac_pc.txt">Download raw PCoA data (Right click - Save as)</a>"""
+        }
+        self.assertEqual(obs_links, exp_links)
+        self.assertEqual(obs_title, "weighted unifrac")
 
     def test_get_html_table_links(self):
-        obs = get_html_table_links(self.dict_links)
+        """The HTML table string is generated correctly"""
+        obs = get_html_table_links(self.dict_links, "weighted unifrac")
         self.assertEqual(obs, exp_html_table_links)
 
     def test_get_html_string(self):
-        self._create_pcoa_output_structure(self.pcoa_dir)
-        self._dirs_to_clean_up = [self.pcoa_dir]
-        
-        obs = get_html_string(self.pcoa_dir)
+        """The HTML string is generated correctly"""
+        # Generate the PCoA output directory
+        pcoa_dir = get_tmp_filename(tmp_dir=self.tmp_dir, suffix='')
+        self._create_pcoa_output_structure(pcoa_dir)
+        # Add the PCoA output to the cleaning paths
+        self._dirs_to_clean_up = [pcoa_dir]
+        # Perform the test
+        obs = get_html_string(pcoa_dir)
         self.assertEqual(obs, exp_html_string)
+
+    def test_make_html_file(self):
+        """The HTML file is stored in the correct location"""
+        # Generate the PCoA output directory
+        pcoa_dir = get_tmp_filename(tmp_dir=self.tmp_dir, suffix='')
+        self._create_pcoa_output_structure(pcoa_dir)
+        # Add the PCoA output to the cleaning paths
+        self._dirs_to_clean_up = [pcoa_dir]
+        # Perform the test
+        html_fp = get_tmp_filename(tmp_dir=self.tmp_dir, suffix='.html')
+        make_html_file(pcoa_dir, html_fp)
+        self.assertTrue(exists(html_fp))
 
 exp_html_table_links = """<table cellpadding=1 cellspacing=1 border=1>
     <tr>
-        <td class="header">PCoA</td>
+        <td class="header">PCoA - weighted unifrac</td>
     </tr>
     <tr>
-        <td class="table_cell"><a class="table_cell" target="_blank" href="weighted_unifrac_2d_continuous/weighted_unifrac_pc_2D_PCoA_plots.html">View weighted unifrac 2d continuous coloring plots</a></td>
+        <td class="table_cell"><a class="table_cell" target="_blank" href="weighted_unifrac_2d_continuous/weighted_unifrac_pc_2D_PCoA_plots.html">View 2d continuous coloring plots</a></td>
     </tr>
 <tr>
-        <td class="table_cell"><a class="table_cell" target="_blank" href="weighted_unifrac_2d_discrete/weighted_unifrac_pc_2D_PCoA_plots.html">View weighted unifrac 2d discrete coloring plots</a></td>
+        <td class="table_cell"><a class="table_cell" target="_blank" href="weighted_unifrac_2d_discrete/weighted_unifrac_pc_2D_PCoA_plots.html">View 2d discrete coloring plots</a></td>
     </tr>
 <tr>
-        <td class="table_cell"><a class="table_cell" target="_blank" href="weighted_unifrac_3d_continuous/weighted_unifrac_pc_3D_PCoA_plots.html">View weighted unifrac 3d continuous coloring plots</a></td>
-    </tr>
-<tr>
-        <td class="table_cell"><a class="table_cell" target="_blank" href="weighted_unifrac_3d_discrete/weighted_unifrac_pc_3D_PCoA_plots.html">View weighted unifrac 3d discrete coloring plots</a></td>
+        <td class="table_cell"><a class="table_cell" target="_blank" href="index.html">View 3d plots</a></td>
     </tr>
 <tr>
         <td class="table_cell"><a class="table_cell" target="_blank" href="weighted_unifrac_pc.txt">Download raw PCoA data (Right click - Save as)</a></td>
-    </tr>
-<tr>
-        <td class="table_cell"><a class="table_cell" target="_blank" href="weighted_unifrac_3d_continuous/random_name/weighted_unifrac_pc.txt.kin">Download kinemage continuous coloring file (Right click - Save as)</a></td>
-    </tr>
-<tr>
-        <td class="table_cell"><a class="table_cell" target="_blank" href="weighted_unifrac_3d_discrete/random_name/weighted_unifrac_pc.txt.kin">Download kinemage discrete coloring file (Right click - Save as)</a></td>
     </tr>
 
 </table>
@@ -278,28 +161,19 @@ exp_html_string = """<html>
         <div>
             <table cellpadding=1 cellspacing=1 border=1>
     <tr>
-        <td class="header">PCoA</td>
+        <td class="header">PCoA - weighted unifrac</td>
     </tr>
     <tr>
-        <td class="table_cell"><a class="table_cell" target="_blank" href="weighted_unifrac_2d_continuous/weighted_unifrac_pc_2D_PCoA_plots.html">View weighted unifrac 2d continuous coloring plots</a></td>
+        <td class="table_cell"><a class="table_cell" target="_blank" href="weighted_unifrac_2d_continuous/weighted_unifrac_pc_2D_PCoA_plots.html">View 2d continuous coloring plots</a></td>
     </tr>
 <tr>
-        <td class="table_cell"><a class="table_cell" target="_blank" href="weighted_unifrac_2d_discrete/weighted_unifrac_pc_2D_PCoA_plots.html">View weighted unifrac 2d discrete coloring plots</a></td>
+        <td class="table_cell"><a class="table_cell" target="_blank" href="weighted_unifrac_2d_discrete/weighted_unifrac_pc_2D_PCoA_plots.html">View 2d discrete coloring plots</a></td>
     </tr>
 <tr>
-        <td class="table_cell"><a class="table_cell" target="_blank" href="weighted_unifrac_3d_continuous/weighted_unifrac_pc_3D_PCoA_plots.html">View weighted unifrac 3d continuous coloring plots</a></td>
-    </tr>
-<tr>
-        <td class="table_cell"><a class="table_cell" target="_blank" href="weighted_unifrac_3d_discrete/weighted_unifrac_pc_3D_PCoA_plots.html">View weighted unifrac 3d discrete coloring plots</a></td>
+        <td class="table_cell"><a class="table_cell" target="_blank" href="index.html">View 3d plots</a></td>
     </tr>
 <tr>
         <td class="table_cell"><a class="table_cell" target="_blank" href="weighted_unifrac_pc.txt">Download raw PCoA data (Right click - Save as)</a></td>
-    </tr>
-<tr>
-        <td class="table_cell"><a class="table_cell" target="_blank" href="weighted_unifrac_3d_continuous/random_name/weighted_unifrac_pc.txt.kin">Download kinemage continuous coloring file (Right click - Save as)</a></td>
-    </tr>
-<tr>
-        <td class="table_cell"><a class="table_cell" target="_blank" href="weighted_unifrac_3d_discrete/random_name/weighted_unifrac_pc.txt.kin">Download kinemage discrete coloring file (Right click - Save as)</a></td>
     </tr>
 
 </table>

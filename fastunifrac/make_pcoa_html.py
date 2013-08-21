@@ -17,7 +17,7 @@ PCOA_2D_DISCRETE_INDEX = 1
 PCOA_3D_INDEX = 2
 RAW_DATA_INDEX = 3
 
-PCOA_STRING = "View %s coloring plots"
+PCOA_STRING = "View %s plots"
 RAW_DATA_STRING = "Download raw PCoA data (Right click - Save as)"
 
 LINK_HTML = """<a class="table_cell" target="_blank" href="%s">%s</a>"""
@@ -29,7 +29,7 @@ ROW_TABLE_HTML = """<tr>
 
 TABLE_HTML = """<table cellpadding=1 cellspacing=1 border=1>
     <tr>
-        <td class="header">PCoA</td>
+        <td class="header">PCoA - %s</td>
     </tr>
     %s
 </table>
@@ -59,7 +59,7 @@ def get_dict_links(pcoa_dir):
 
         Returns dict of: {index: html_link}
             where:
-                index: sets the index order to show the link
+                index: the index order to show the link
                 html_link: string which contains the html link
     """
     # Get a list of (path, name) with the PCoA directory content
@@ -82,22 +82,23 @@ def get_dict_links(pcoa_dir):
                     f = join(path, content)
                     if isfile(f):
                         # This is the html file
-                        str_link = PCOA_STRING % (' '.join(split_name))
+                        str_link = PCOA_STRING % ('2d %s coloring' % split_name[-1])
                         link = LINK_HTML % (join(name, content), str_link)
                         break
                 links[index] = link
         else:
             if name == "index.html":
                 # This is the Emperor html file - 3d plots
-                str_link = PCOA_STRING % 'unifrac 3d'
+                str_link = PCOA_STRING % '3d'
                 links[PCOA_3D_INDEX] = LINK_HTML % (name, str_link)
             else:
                 # Check if it is the principal coordinates file
                 if name.split('_')[-1] == 'pc.txt':
                     links[RAW_DATA_INDEX] = LINK_HTML % (name, RAW_DATA_STRING)
-    return links
+                    title = ' '.join(name.split('_')[:-1])
+    return links, title
 
-def get_html_table_links(links_dict):
+def get_html_table_links(links_dict, title):
     """
         links_dict: dict of: {index: html_link}
             where:
@@ -114,7 +115,7 @@ def get_html_table_links(links_dict):
     for key in sorted_keys:
         html_rows_string += ROW_TABLE_HTML % links_dict[key]
 
-    return TABLE_HTML % html_rows_string
+    return TABLE_HTML % (title, html_rows_string)
 
 def get_html_string(pcoa_dir):
     """
@@ -123,10 +124,10 @@ def get_html_string(pcoa_dir):
         Returns a string which contains the full page html code.
     """
     # Get a dict of {index, link} with the html links
-    links = get_dict_links(pcoa_dir)
+    links, title = get_dict_links(pcoa_dir)
 
     # Get the html string with all the links ordered by index
-    html_table_links_string = get_html_table_links(links)
+    html_table_links_string = get_html_table_links(links, title)
 
     # Return the string with the full page html code
     return PAGE_HTML % (html_table_links_string)
