@@ -1,8 +1,18 @@
-<tool id="unifrac_significance" name="Unifrac Significance" version="1.0">
+<!--
+	author = Jose Antonio Navas Molina
+	copyright = Copyright 2013, The FastUniFrac Project
+	credits = Jose Antonio Navas Molina
+	license = GPL
+	version = 1.7.0-dev
+	maintainer = Jose Antonio Navas Molina
+	email = josenavasmolina@gmail.com
+	status = Development
+-->
+<tool id="unifrac_significance" name="Unifrac Significance" version="1.7.0-dev">
 	<description>Tells you which pairs of samples are significantly different using the UniFrac significance test.</description>
 	<command>
-		convert_category_map_to_id_map.py -i $category_map_file -o fasting_map.txt;
-		convert_sample_id_map_to_otu_table.py -i $sample_id_file -o otu_table.biom;
+		convert_category_map_to_id_map.py -i $category_map_file -o mapping.txt;
+		convert_unifrac_sample_mapping_to_otu_table.py -i $sample_id_file -o otu_table.biom;
 		#if str($type_of_test) == "each_pair":
 			#import os
 			#set $output = os.system("check_pairwise.py -i " + str($category_map_file) + " -p " + str($u_permutations) + " -o " + str($unifrac_output))
@@ -17,7 +27,7 @@
 				#else:
 					-s unweighted_unifrac;
 				#end if
-				make_beta_significance_heatmap.py -i $unifrac_output -m fasting_map.txt -o $output_html --output_dir=$output_html.files_path
+				make_beta_significance_heatmap.py -i $unifrac_output -m mapping.txt -o $output_html --output_dir=$output_html.files_path
 			#else:
 				copy_data.py -i $unifrac_output -o $output_html;
 				exit 1

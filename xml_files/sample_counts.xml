@@ -1,9 +1,19 @@
-<tool id="sample_counts" name="Sample counts" version="1.0">
+<!--
+	author = Jose Antonio Navas Molina
+	copyright = Copyright 2013, The FastUniFrac Project
+	credits = Jose Antonio Navas Molina
+	license = GPL
+	version = 1.7.0-dev
+	maintainer = Jose Antonio Navas Molina
+	email = josenavasmolina@gmail.com
+	status = Development
+-->
+<tool id="sample_counts" name="Sample counts" version="1.7.0-dev">
 	<description>Tells you how many sequences are in each sample.</description>
 	<command>
-		convert_category_map_to_id_map.py -i $category_map_file -o fasting_map.txt;
-		convert_sample_id_map_to_otu_table.py -i $sample_id_file -o otu_table.biom;
-		per_library_stats.py -i otu_table.biom -o per_lib_stats_output.txt -m fasting_map.txt
+		convert_category_map_to_id_map.py -i $category_map_file -o mapping.txt;
+		convert_unifrac_sample_mapping_to_otu_table.py -i $sample_id_file -o otu_table.biom;
+		per_library_stats.py -i otu_table.biom -o per_lib_stats_output.txt -m mapping.txt
         #if not $weights:
             --otu_counts
         #end if
