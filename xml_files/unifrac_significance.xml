@@ -1,0 +1,127 @@
+<tool id="unifrac_significance" name="Unifrac Significance" version="1.0">
+	<description>Tells you which pairs of samples are significantly different using the UniFrac significance test.</description>
+	<command>
+		convert_category_map_to_id_map.py -i $category_map_file -o fasting_map.txt;
+		convert_sample_id_map_to_otu_table.py -i $sample_id_file -o otu_table.biom;
+		#if str($type_of_test) == "each_pair":
+			#import os
+			#set $output = os.system("check_pairwise.py -i " + str($category_map_file) + " -p " + str($u_permutations) + " -o " + str($unifrac_output))
+			#if not $output:
+				beta_significance.py -i otu_table.biom -o $unifrac_output -t $tree_file -n $u_permutations -k $type_of_test
+				#if $use_abundance_weights.weights:
+					#if $use_abundance_weights.normalized:
+						-s weighted_normalized_unifrac;
+					#else:
+						-s weighted_unifrac;
+					#end if
+				#else:
+					-s unweighted_unifrac;
+				#end if
+				make_beta_significance_heatmap.py -i $unifrac_output -m fasting_map.txt -o $output_html --output_dir=$output_html.files_path
+			#else:
+				copy_data.py -i $unifrac_output -o $output_html;
+				exit 1
+			#end if
+		#else if str($type_of_test) == "each_sample":
+			beta_significance.py -i otu_table.biom -o $unifrac_output -t $tree_file -n $u_permutations -k $type_of_test
+			#if $use_abundance_weights.weights:
+				#if $use_abundance_weights.normalized:
+					-s weighted_normalized_unifrac;
+				#else:
+					-s weighted_unifrac;
+				#end if
+			#else:  
+				-s unweighted_unifrac;
+			#end if
+			make_unifrac_significance_each_sample_html.py -i $unifrac_output -o $output_html_indiv
+		#end if
+	</command>
+	<inputs>
+		<param name="tree_file" type="data" label="Select reference tree"/>
+		<param name="sample_id_file" type="data" label="Select sample ID mapping file"/>
+		<param name="category_map_file" type="data" label="Select category mapping file"/>
+		<param name="u_permutations" type="select" label="Number of permutations">
+			<option value="50">50</option>
+			<option value="100">100</option>
+			<option value="500">500</option>
+			<option value="750">750</option>
+			<option value="1000">1000</option>
+		</param>
+		<conditional name="use_abundance_weights">
+			<param name="weights" type="boolean" default="False" label="Use abundance weights"/>
+			<when value="true">
+				<param name="normalized" type="boolean" default="false" label="Normalized"/>
+			</when>
+		</conditional>
+        <param name="type_of_test" type="select" label="Type of test">
+            <option value="all_together">All samples together</option>
+            <option value="each_pair">Each pair of samples</option>
+            <option value="each_sample">Each sample individually</option>
+        </param>
+	</inputs>
+	<outputs>
+		<data format="txt" name="unifrac_output"/>
+		<data format="html" name="output_html">
+			<filter>(type_of_test == "each_pair")</filter>
+		</data>
+		<data format="html" name="output_html_indiv">
+			<filter>(type_of_test == "each_sample")</filter>
+		</data>
+	</outputs>
+	<stdio>
+		<exit_code range="1:" level="fatal" />
+	</stdio>
+	<help>
+**Calculating the UniFrac metric:** The majority of options in the FastUniFrac interface make comparisons based on the UniFrac metric. The UniFrac metric measures the difference between two samples in therms of the branch length that is unique to one sample or the other. In the tree on the right (panel C below), the division between the two samples (labeled red and blue) occurs very early in the tree, so that all of the branch length is unique to one sample or the other. This results in the maximum UniFrac distance possible, 1.0. In the tree on the left, every sequence in the first samples has a very similar counterpart in the other samples, and all of the branch length in the tree comes from nodes that have descendants in both samples. The results in the minimum UniFrac distance of 0.0. In the middle example, there is about as much branch length unique to each sample (red or blue) as is shared between samples (purple), so the UniFrac distance would be about 0.5.
+
+.. image:: ./static/images/fastunifrac/unifrac_significance/unifrac_test.jpg
+
+**Calculating the weighted UniFrac metric:** The unifrac metric described above does not account for the relative abundance of sequences in the different samples because duplicate sequences contribute no additional branch length to the tree (by definition, the branch length that separates a pair of duplicate sequences is zero, because no substitutions separete them). Because the relative abundance of different kinds of bacteria can be critical for describing community changes, we have developed a variant of the algorithm, weighted UniFrac, which weights the branches based on abundance information during the calculations. Weighted UniFrac can thus detect changes in how many organisms from each lineage are present, as well as detecting changes in which organisms are present.
+
+The first step in the algorithm is to calculate the raw weighted UniFrac value (u), according to the equation below:
+
+.. image:: ./static/images/fastunifrac/unifrac_significance/weighted_unifrac_equation.jpg
+
+Here, n is the total number of branches in the tree, b\ :sub:`i`\  is the length of branch i, A\ :sub:`i`\  and B\ :sub:`i`\  are the number of descendants of branch i from communities A and B respectively, and A\ :sub:`t`\  and B\ :sub:`t`\  are the total number of sequences from communities A and B respectively. In order to control for unequal sampling effort, A\ :sub:`i`\  and B\ :sub:`i`\  are divided by A\ :sub:`t`\  and B\ :sub:`t`\.
+
+The figure below illustrates how the weighted UniFrac algorithm works. Branch lengths are weighted by relative abundance of sequences in the square and circle communities; square sequences are weighted twice as much as circle sequence because there are twice as many total circle sequences in the dataset. The width of branches is proportional to the degree to which each branch is weighted in the calculations and the grey branches have no weight. Branches 1 and 2 have heavy weights since the descendants are baised towards the square and circles respectively. Branch 3 contributes no value since it has an equal contribution from circle and square sequences after normalization for different sample sizes.
+
+.. image:: ./static/images/fastunifrac/unifrac_significance/weighted_unifrac_fig.jpg
+
+**Normalizing weighted UniFrac values:** If the phylogenetic tree is not ultrametric (i.e. if different sequences in the sample have evolved at different rates), comparing samples with the Cluster Samples or PCoA analysis options using weighted UniFrac will place more emphasis on communities that contain taxa that have evolved more quickly. This is because these taxa contribute more branch length to the tree. In some situtations, it may be desirable to normalize the branch lengths within each sample. This normalization has the effect of treating each sample equally instead of treating each unit of branch equally: the issues involved are similar to those involved in performing multivariate analyses using the correlation matrix, to treat each variable equally independent of scale, or using the covariance matrix, to take the scale into account. Normalization has the additional effect of placing all pairwise comparisons on the same scale as unweighted UniFrac (0 for identical communities, 1 for non-overlapping communities), allowing comparisons among different analyses with different samples. The scale of the raw weighted UniFrac value (u) depends on the average distance of each sequence from the root. The normalization to correct for this effect is performed by dividing u by the distance scale factor D (see equation below), which is the average distance of each sequence from the root weighted by the number of times each sequence was observed in each community.
+
+.. image:: ./static/images/fastunifrac/unifrac_significance/normalization_equation.jpg
+
+Here d\ :sub:`j`\  is the distance of sequence j from the root, A\ :sub:`j`\  and B\ :sub:`j`\  are the number of times the sequences were observed in communities A and B respectively, and A\ :sub:`T`\  and B\ :sub:`T`\  are the total number of sequences from communities A and B respectively.
+
+**Calculating UniFrac Significance:** The UniFrac metrix can be used to measure whether the microbial communities in the samples are significantly different. Saples are significantly different if the UniFrac value for the real tree is greater than would be expected if the sequences were randomly distributed between the samples. To test this, the sample IDs are randomly permuted across the sequences in the tree and a new UniFrac value is calculated. This is repeated a number of times (determined by the selected value of the **Number of permutations** option, e.g. 1000 times). The reported p-value is the fraction of permuted trees that have UniFrac values greater or equal to that of the real tree.
+
+.. image:: ./static/images/fastunifrac/unifrac_significance/unifrac_observed.jpg
+
+------------
+Type of test
+------------
+
+When the **All samples together** option is selected, it tests whether the sequences from all of the different samples in the tree are significantly different from each other. For instance, if there are sequences from 3 different samples in the tree, the UniFrac values are calculated as the percent of the branch length in the tree that leads to descendants from only one of the 3 samples. The output is a single p-value.
+
+When the **Each pair of samples** option is selected, it tests whether each pair of samples differs from one another. For all possible pairs of samples, it first removes all sequences not in one of two samples and then calculates the UniFrac significance. The calculated p-values are output in two different heatmaps. In the first heatmap, the value have been corrected for multiple comparisons by multiplying them by the number of comparisons that were made (the Bonferroni correction). The second heatmap displays the raw, uncorrected values. The samples IDs are displayed in the column and row headers, if you move your mouse over the individual cells in the heatmap, it will display the sample IDs being compared and the associated p-value. Each cell is colored by the p-value and a color key is provided below the table. The raw data from each table can be downloaded as a tab-delimited file. An example of the output is shown below:
+
+.. image:: ./static/images/fastunifrac/unifrac_significance/output_example_each_pair.jpg
+
+When the **Each sample individually** option is selected, for each sample, it treats the rest of the tree as a single **other** sample and determines if that particular sample has more unique branch length than expected by chance. If again we are looking at a tree with sequences from 3 different samples, and we determine that the samples are significantly different when evaluating **All samples together** , the tree can theoretically have a significant UniFrac signifcance value only because of unique lineages in one particular sample. The **Each sample individually** option provides a p-value for each sample in the tree and can be used to determine which particular sample is contributing the most unique branch length. The output is a table of p-values for each sample indicating whether that sample is significantly different from the rest of the tree. An example of the output is shown below. This result would indicate that only the sample ID **E#PA** has a significant amount of unique branch length with respect to the other samples in the tree.
+
+.. image:: ./static/images/fastunifrac/unifrac_significance/output_example_each_sample.jpg
+
+----------------------
+Number of permutations
+----------------------
+
+The number of tree permutations used to generate the random distribution of values to which the value of the true tree is compared when calculating a p-value. You must choose a population size that is appropriate for the number of samples you wish to analyzing, taking into account the fact that the p-values are corrected for multiple comparisons.
+
+---------------------
+Use abundance weights
+---------------------
+
+When the **No** option is selected, it uses the standard unweighted UniFrac algorithm to perform the calculations. If the **Yes** option is selected, it uses the weighted UniFrac algorithm; when the weighted sub-option **Normalized** is selected, it performs a normalization step in the weighted UniFrac value calculation, whereas the **Non-normalized** option this normalization is not applied.
+	</help>
+</tool>

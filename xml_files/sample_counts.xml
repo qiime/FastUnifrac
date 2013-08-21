@@ -1,0 +1,29 @@
+<tool id="sample_counts" name="Sample counts" version="1.0">
+	<description>Tells you how many sequences are in each sample.</description>
+	<command>
+		convert_category_map_to_id_map.py -i $category_map_file -o fasting_map.txt;
+		convert_sample_id_map_to_otu_table.py -i $sample_id_file -o otu_table.biom;
+		per_library_stats.py -i otu_table.biom -o per_lib_stats_output.txt -m fasting_map.txt
+        #if not $weights:
+            --otu_counts
+        #end if
+        ;make_sample_counts_html.py -m per_lib_stats_output.txt -o $html_output
+	</command>
+	<inputs>
+		<param name="tree_file" type="data" label="Select reference tree"/>
+		<param name="sample_id_file" type="data" label="Select sample ID mapping file"/>
+		<param name="category_map_file" type="data" label="Select category mapping file"/>
+        <param name="weights" type="boolean" default="false" label="Use abundance weights"/>
+	</inputs>
+	<outputs>
+		<data format="html" name="html_output"/>
+	</outputs>
+	<stdio>
+		<exit_code range="1:" level="fatal" />
+	</stdio>
+	<help>
+The **Sample Counts** option produces a table that reports number of sequences in eachs ample, along with a description of each sample (if you provided that information in the category mapping file). An example of the sample counts table is shown below.
+
+.. image:: ./static/images/fastunifrac/sample_counts/output_example.jpg
+	</help>
+</tool>

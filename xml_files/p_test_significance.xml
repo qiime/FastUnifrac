@@ -1,0 +1,56 @@
+<tool id="p_test_significance" name="P Test Significance" version="1.0">
+	<description>Tells you which pairs of samples are significantly different using the P Test.</description>
+	<command>
+		convert_category_map_to_id_map.py -i $category_map_file -o fasting_map.txt;
+		convert_sample_id_map_to_otu_table.py -i $sample_id_file -o otu_table.biom;
+		#if str($type_of_test) == "each_pair":
+			#import os
+			#set $output = os.system("check_pairwise.py -i " + str($category_map_file) + " -p 1000 -o " + str($p_test_output))
+			#if not $output:
+				beta_significance.py -i otu_table.biom -o $p_test_output -s p-test -t $tree_file -n 1000 -k $type_of_test;
+				make_beta_significance_heatmap.py -i $p_test_output -m fasting_map.txt -o $output_html --output_dir=$output_html.files_path;
+			#else:
+				copy_data.py -i $p_test_output -o $output_html;
+				exit 1 
+			#end if
+		#else:
+			beta_significance.py -i otu_table.biom -o $p_test_output -s p-test -t $tree_file -n 1000 -k $type_of_test;
+		#end if
+	</command>
+	<inputs>
+		<param name="tree_file" type="data" label="Select reference tree"/>
+		<param name="sample_id_file" type="data" label="Select sample ID mapping file"/>
+		<param name="category_map_file" type="data" label="Select category mapping file"/>
+        <param name="type_of_test" type="select" label="Type of test">
+            <option value="all_together">All samples together</option>
+            <option value="each_pair">Each pair of samples</option>
+        </param>
+	</inputs>
+	<outputs>
+		<data format="txt" name="p_test_output"/>
+		<data format="html" name="output_html">
+			<filter>(type_of_test == "each_pair")</filter>
+		</data>
+	</outputs>
+	<stdio>
+		<exit_code range="1:" level="fatal" />
+	</stdio>
+	<help>
+The **P Test** (Martin, A. 2002. Appl. Environ. Microbiol. 68:3673-82) also uses phylogenetic information to test whether two samples are significantly different. It estimates similarity between communities as the number of parsimony changes (change from one sample to another along a branch) that would be required to explain the distribution of sequences between the different samples in the tree. A phylogenetic tree representing the sequences from very different communities would require fewer parsimony changes to explain the distribution of sequences between samples than if the samples were similar. One way to think about this is that if two samples are mutually exclusive, only one parsimony change is required to separate the sequences in one sample from the other (see example below), whereas if the two were identical and had the same sequences we would expect all sequences to be found in both, requiring a large number of parsimony changes.
+
+.. image:: ./static/images/fastunifrac/p_test_significance/p_test.jpg
+
+**Generating the P Test p-value** *Two samples that are extremely well-separated on a tree (A) require few changes, and perhaps only one change, between samples to explain the modern distribution of lineages in samples. The minimum number of changes from one sample to another is inferred by parsimony. This observed value is compared to a distribution values obtained by randomizing the sample to ehich each sequence is assigned, and re-inferring the number of parsimony changes required for these permuted sample sets. If the observed value is much lower than the averafe for the distribution, we conclude that organisms are significantly clustered by sample. The p-value is the fraction of random permutations of the labels that require fewer parsimony changes to explain than does the actual labeling. Note that the p-value is a measure of statistical significance, not of distance between samples.*
+
+------------
+Type of test
+------------
+
+When the **All samples together** option is selcted, it tests whether the sequences from all of the different samples in the tree are significantly different from each other. For instance, if there are sequences from 4 different samples in the tree, the parsimony changes is the number required to describe the distribution of sequences from the 4 different samples on the tree. The output is a single p-value indicating whether the samples are significantly clustered on the tree.
+
+When the **Each pair of samples** option is selcted, it tests whether each pair of samples differs from one another. For all possible pairs of samples, it first removes all sequences not in one of two samples and then calculates significance. The calculated p-values are output in two separate tables. In the first table, the values have been corrected for multiple comparisons by multiplying them by the number of comparisons that were made (the Bonferroni correction). The second table displays the raw, uncorrected values. The samples IDs are displayed in the column and row headers, if you move your mouse over the individual cells in the heatmap, it will display the sample IDs being compared and the associated p-value. Each cell is colored by the p-value and a color key is provided below the table. The raw data from each heatmap can be downloaded as a tab-delimited file. An example og the output is shown below:
+
+.. image:: ./static/images/fastunifrac/p_test_significance/example_output.jpg
+
+	</help>
+</tool>
