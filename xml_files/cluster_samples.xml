@@ -1,8 +1,18 @@
-<tool id="cluster_samples" name="Cluster samples" version="1.0">
+<!--
+	author = Jose Antonio Navas Molina
+	copyright = Copyright 2013, The FastUniFrac Project
+	credits = Jose Antonio Navas Molina
+	license = GPL
+	version = 1.7.0-dev
+	maintainer = Jose Antonio Navas Molina
+	email = josenavasmolina@gmail.com
+	status = Development
+-->
+<tool id="cluster_samples" name="Cluster samples" version="1.7.0-dev">
 	<description>Uses the UniFrac metric to cluster the samples based on phylogenetic lineages they contain.</description>
 	<command>
-		convert_category_map_to_id_map.py -i $category_map_file -o fasting_map.txt;
-		convert_sample_id_map_to_otu_table.py -i $sample_id_file -o otu_table.biom;
+		convert_category_map_to_id_map.py -i $category_map_file -o mapping.txt;
+		convert_unifrac_sample_mapping_to_otu_table.py -i $sample_id_file -o otu_table.biom;
 		beta_diversity.py -i otu_table.biom -t $tree_file -o ./output
 		#if $use_abundance_weights.weights:
 			#if $use_abundance_weights.normalized:
@@ -17,7 +27,7 @@
 			#set filename = 'output/unweighted_unifrac_otu_table.txt'
 		#end if
 		upgma_cluster.py -i $filename -o $cluster_samples_output;
-		make_cluster_samples_file.py -t $cluster_samples_output -m fasting_map.txt -o $output_html --output_dir=$output_html.files_path
+		make_cluster_samples_file.py -t $cluster_samples_output -m mapping.txt -o $output_html --output_dir=$output_html.files_path
 	</command>
 	<inputs>
 		<param name="tree_file" type="data" label="Select reference tree"/>
