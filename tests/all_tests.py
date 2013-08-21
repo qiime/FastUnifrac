@@ -8,12 +8,12 @@ from glob import glob
 from qiime.util import get_qiime_scripts_dir
 import re
 
-__author__ = "Rob Knight"
-__copyright__ = "Copyright 2011, The QIIME Project" #consider project name
-__credits__ = ["Rob Knight","Greg Caporaso", "Jose Antonio Navas"] #remember to add yourself if you make changes
+__author__ = "Jose Antonio Navas Molina"
+__copyright__ = "Copyright 2013, The FastUniFrac Project"
+__credits__ = ["Jose Antonio Navas Molina"]
 __license__ = "GPL"
-__version__ = "1.4.0-dev"
-__maintainer__ = "Jose Antonio Navas"
+__version__ = "1.7.0-dev"
+__maintainer__ = "Jose Antonio Navas Molina"
 __email__ = "josenavasmolina@gmail.com"
 __status__ = "Development"
 
