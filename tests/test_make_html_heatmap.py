@@ -20,6 +20,7 @@ from fastunifrac.make_html_heatmap import (get_coords, generate_xmap,
 
 class MakeHtmlHeatmapTest(TestCase):
     def setUp(self):
+        """Set up some test variables"""
         self.qiime_config = load_qiime_config()
         self.tmp_dir = self.qiime_config['temp_dir'] or '/tmp/'
 
@@ -100,10 +101,12 @@ class MakeHtmlHeatmapTest(TestCase):
         self._dirs_to_clean_up = []
 
     def tearDown(self):
+        """Cleans up the environment once the tests finish"""
         map(remove, self._paths_to_clean_up)
         map(rmdir, self._dirs_to_clean_up)
 
     def test_get_coords(self):
+        """The XY coords for the AREA tag are retrieved correctly"""
         data = self.list_data_single_plot[0]
 
         plot_output_dir = path.join(self.tmp_dir, "plot_dir")
@@ -129,6 +132,7 @@ class MakeHtmlHeatmapTest(TestCase):
         self.assertEqual(all_ycoords, result_all_ycoords)
 
     def test_generate_xmap(self):
+        """The AREA tag is generated correctly"""
         data = self.list_data_single_plot[0]
 
         plot_output_dir = path.join(self.tmp_dir, "plot_dir")
@@ -151,6 +155,7 @@ class MakeHtmlHeatmapTest(TestCase):
         self.assertEqual(xmap, result_xmap)
 
     def test_get_html_table_string(self):
+        """The HTML table is correct"""
         data = self.list_data_single_plot[0]
 
         png_img_fp = path.join(self.output_dir, data[LD_NAME] + '.png')
@@ -172,6 +177,7 @@ class MakeHtmlHeatmapTest(TestCase):
             'The eps file was not created in the appropiate location')
 
     def test_get_html_page_string(self):
+        """The HTML page is correct"""
         data = self.list_data_single_plot[0]
         data1 = self.list_data_multiple_plots[1]
 
@@ -220,6 +226,7 @@ class MakeHtmlHeatmapTest(TestCase):
             'The eps file was not created in the appropiate location')
 
     def test_make_html_file(self):
+        """The HTML file is generated in the correct place"""
         data = self.list_data_multiple_plots[0]
         data1 = self.list_data_multiple_plots[1]
 

@@ -10,16 +10,20 @@ __email__ = "josenavasmolina@gmail.com"
 __status__ = "Development"
 
 def parse_jackknife_support_file(lines):
-    """
-        lines: jackknife support file lines
+    """Parses the jackknife support file
 
-        Returns dict of: { 'trees_considered': int,
-            'support_dict': dict of {node_name:float}}
+    Inputs:
+        lines: jackknife support open file object
+
+    Returns dict of: { 'trees_considered': int,
+                        'support_dict': dict of {node_name:float}}
     """
     result = {}
     dict_support = {}
+    # Loop through all the lines in the file
     for line in lines:
         if line[0] == '#':
+            # In one of the comment lines there is the number of trees used
             try:
                 comment, num_trees = line.split(':')
                 result['trees_considered'] = int(num_trees)
@@ -33,20 +37,24 @@ def parse_jackknife_support_file(lines):
     return result
 
 def parse_beta_significance_output_pairwise(lines):
-    """
-        Parser for beta significance output file (e.g. p-test each_pair significance)
+    """Parses the pairwise beta significance output file
 
-        According to beta significance output file format, the first row contains a comment
-        which indicates the test realized, and the second row contains the headers, which
-        should be 'sample 1', 'sample 2', 'p value', 'p value (Bonferroni corrected)'. Thus,
-        we start parsing the values on third row.
+    Inputs:
+        lines: beta significance open file object
 
-        Returns:
+    Returns:
             result: dict of: {(sample 1, sample 2),(p value, p value corrected)}
             test_name: string with the name of the test realized
+
+    According to beta significance output file format, the first row contains a
+        comment which indicates the test realized, and the second row contains
+        the headers, which should be 'sample 1', 'sample 2', 'p value', 'p value
+        (Bonferroni corrected)'. Thus, we start parsing the values on third row.
     """
-    comment = lines.next() #Get comment line
-    lines.next() #Pass header line
+    #Get comment line
+    comment = lines.next()
+    #Pass header line
+    lines.next()
     result = {}
     for line in lines:
         sample1, sample2, pval, pvalcorr = line.split('\t')
@@ -61,20 +69,24 @@ def parse_beta_significance_output_pairwise(lines):
     return result, test_name
 
 def parse_beta_significance_output_each_sample(lines):
-    """
-        Parser for beta significance output file (e.g. unifrac each_sample significance)
+    """Parses the each sample beta significance output file
 
-        According to beta significance output file format, the first row contains a comment
-        which indicates the test realized, and the second row contains the headers, which
-        should be 'sample', 'p value', 'p value (Bonferroni corrected)'. Thus,
-        we start parsing the values on the third row.
+    Inputs:
+        lines: beta significance open file object
 
-        Returns:
+    Returns:
             result: dict of: {sample: (p value, p value corrected)}
             test_name: string with the name of the test realized
+
+    According to beta significance output file format, the first row contains a
+        comment which indicates the test realized, and the second row contains
+        the headers, which should be 'sample', 'p value', 'p value (Bonferroni
+        corrected)'. Thus, we start parsing the values on the third row.
     """
-    comment = lines.next() #Get comment line
-    lines.next() #Pass header line
+    #Get comment line
+    comment = lines.next()
+    #Pass header line
+    lines.next()
     result = {}
     for line in lines:
         sample, pval, pvalcorr = line.split('\t')

@@ -9,15 +9,22 @@ __maintainer__ = "Jose Antonio Navas Molina"
 __email__ = "josenavasmolina@gmail.com"
 __status__ = "Development"
 
-from cogent.util.option_parsing import parse_command_line_parameters, make_option
+from qiime.util import parse_command_line_parameters, make_option
 from fastunifrac.parse import parse_beta_significance_output_each_sample
-from fastunifrac.make_unifrac_significance_each_sample_html import make_html_file
+from fastunifrac.make_unifrac_significance_each_sample_html import \
+    make_html_file
 
 script_info = {}
-script_info['brief_description'] = """Generates a html file with a table showing the beta significance output test (each sample individually)."""
-script_info['script_description'] = """Takes a beta significance each sample individually test output file (file output of beta_significance.py) and generates a html file containing a table showing the results."""
-script_info['script_usage'] = [("Example", "Generate a html file named 'index.html' with a table showing the beta significance test results represented in 'beta_sig_output.txt'",
-    "%prog -i beta_sig_output.txt -o index.html")]
+script_info['brief_description'] = """Generates a html file with a table\
+ showing the beta significance output test (each sample individually)."""
+script_info['script_description'] = """Takes a beta significance each sample\
+ individually test output file (file output of beta_significance.py) and\
+ generates a html file containing a table showing the results."""
+script_info['script_usage'] = [
+    ("Example", "Generate a html file named 'index.html' with a table showing "+
+        "the beta significance test results represented in 'beta_output.txt'",
+        "%prog -i beta_output.txt -o index.html")
+]
 script_info['output_description'] = ""
 script_info['required_options'] = [
     make_option('-i', '--input_fp', type="existing_filepath",

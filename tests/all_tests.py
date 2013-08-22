@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-"""Run all tests.
-"""
 from os import walk, environ
 from subprocess import Popen, PIPE, STDOUT
 from os.path import join, abspath, dirname, split
@@ -44,8 +42,8 @@ def main():
     bad_tests = []
     missing_application_tests = []
 
-    # Run through all of FastUnifrac's unit tests, and keep track of any files which
-    # fail unit tests.
+    # Run through all of FastUnifrac's unit tests, and keep track of any files
+    # which fail unit tests.
     unittest_names = []
 
     for root, dirs, files in walk(test_dir):

@@ -10,8 +10,6 @@ __email__ = "josenavasmolina@gmail.com"
 __status__ = "Development"
 
 __all__ = ['add_counts_to_mapping',
-    'check_id_map',
-    'convert_category_map_to_id_map',
     'make_beta_significance_heatmap',
     'make_distance_matrix_heatmap',
     'make_heatmap',

@@ -48,33 +48,48 @@ PAGE_HTML = """
 """
 
 def get_html_table(map_dict):
+    """Get the HTML table string with the summary
+
+    Inputs:
+        map_dict: dictionary with the mapping file info
+
+    Returns a string with the HTML table code containing the Sample IDs, the
+        counts and the sample Description.
+    """
     table_rows = ""
     total = 0.0
     for key in map_dict.keys():
-        table_rows += ROW_TABLE_HTML % (key, map_dict[key]['NumIndividuals'], map_dict[key]['Description'])
+        table_rows += ROW_TABLE_HTML % (key, map_dict[key]['NumIndividuals'],
+            map_dict[key]['Description'])
         total += float(map_dict[key]['NumIndividuals'])
     table_rows += ROW_TABLE_HTML % ('Total', int(total), '')
     return TABLE_HTML % table_rows
 
 def get_html_page_string(map_dict):
-    """
-        map_dict: 
+    """Creates the full HTML string of the page
+    
+    Inputs:
+        map_dict: dictionary with the mapping file info
+
+    Returns a string which contains the full page html code.
     """
     table_html = get_html_table(map_dict)
 
     return PAGE_HTML % table_html
 
 def make_html_file(lines, html_fp):
-    """
-        lines:
-        html_fp:
+    """Creates the HTML file with a table with the sample counts
+
+    Inputs:
+        lines: mapping file open file object
+        html_fp: file path to store the output html page
+
+    Generates the html file.
     """
     # Parse the mapping file
     (map_dict, list_c) = parse_mapping_file_to_dict(lines)
-
     # Generate the string containing the html code
     page_html_string = get_html_page_string(map_dict)
-
     #Save the html file
     out = open(html_fp, 'w')
     out.write(page_html_string)

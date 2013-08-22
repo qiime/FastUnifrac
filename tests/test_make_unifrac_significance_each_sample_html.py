@@ -10,12 +10,14 @@ __email__ = "josenavasmolina@gmail.com"
 __status__ = "Development"
 
 from cogent.util.unit_test import TestCase, main
-from fastunifrac.make_unifrac_significance_each_sample_html import get_html_table, get_html_legend_table, get_html_page_string, make_html_file
 from qiime.util import load_qiime_config, get_tmp_filename
 from os import remove, path
+from fastunifrac.make_unifrac_significance_each_sample_html import (
+    get_html_table, get_html_legend_table, get_html_page_string, make_html_file)
 
 class MakeUnifracSignificanceEachSampleHtmlTest(TestCase):
     def setUp(self):
+        """Set up some test variables"""
         self.qiime_config = load_qiime_config()
         self.tmp_dir = self.qiime_config['temp_dir'] or '/tmp/'
         self.output_file = get_tmp_filename(tmp_dir = self.tmp_dir)
@@ -33,30 +35,37 @@ class MakeUnifracSignificanceEachSampleHtmlTest(TestCase):
         self._paths_to_clean_up = []
 
     def tearDown(self):
+        """Cleans up the environment once the tests finish"""
         map(remove, self._paths_to_clean_up)
 
     def test_get_html_table(self):
+        """The HTML table is correct"""
         obs = get_html_table(self.d_data, self.title_0, 0)
         self.assertEqual(obs, exp_html_table_0)
 
         obs = get_html_table(self.d_data, self.title_1, 1)
         self.assertEqual(obs, exp_html_table_1)
 
-        self.assertRaises(ValueError, get_html_table, self.d_data, self.title_1, 2)
+        self.assertRaises(ValueError, get_html_table,
+            self.d_data, self.title_1, 2)
 
     def test_get_html_legend_table(self):
+        """The HTML table for the legend is correct"""
         obs = get_html_legend_table()
         self.assertEqual(obs, exp_html_legend_table)
 
     def test_get_html_page_string(self):
+        """The HTML page is correct"""
         obs = get_html_page_string(self.d_data, self.name)
         self.assertEqual(obs, exp_html_page)
 
     def test_make_html_file(self):
+        """The HTML file is created in the right position"""
         self._paths_to_clean_up = [self.output_file]
 
         make_html_file(self.d_data, self.name, self.output_file)
-        self.assertTrue(path.exists(self.output_file), 'The html file was not created in the appropiate location')
+        self.assertTrue(path.exists(self.output_file),
+            'The html file was not created in the appropiate location')
         
 
 exp_html_table_0 = """<table cellpadding=2 cellspacing=2 border=1>

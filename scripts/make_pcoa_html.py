@@ -9,14 +9,19 @@ __maintainer__ = "Jose Antonio Navas Molina"
 __email__ = "josenavasmolina@gmail.com"
 __status__ = "Development"
 
-from cogent.util.option_parsing import parse_command_line_parameters, make_option
+from qiime.util import parse_command_line_parameters, make_option
 from fastunifrac.make_pcoa_html import make_html_file
 
 script_info = {}
-script_info['brief_description'] = """Generates a html file which shows the PCoA results."""
-script_info['script_description'] = """ Generates a html file which shows the PCoA results. """
-script_info['script_usage'] = [("Example", "Generates a html file named 'index.html' with the PCoA results stored under the folder 'pcoa_output_dir'",
-    "%prog -d pcoa_output_dir -o index.html")]
+script_info['brief_description'] = """Generates a html file which shows the\
+ PCoA results."""
+script_info['script_description'] = """ Generates a html file which shows the\
+ PCoA results."""
+script_info['script_usage'] = [
+	("Example", "Generates a html file named 'index.html' with the PCoA " + 
+		"results stored under the folder 'pcoa_output_dir'",
+    	"%prog -d pcoa_output_dir -o index.html")
+]
 script_info['output_description'] = ""
 script_info['required_options'] = [
     make_option('-o', '--output_html_fp', type="new_filepath",

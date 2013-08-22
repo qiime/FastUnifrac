@@ -10,41 +10,42 @@ __email__ = "josenavasmolina@gmail.com"
 __status__ = "Development"
 
 from cogent.util.unit_test import TestCase, main
-from fastunifrac.make_beta_significance_heatmap import generate_headers_and_matrix, generate_dict_data, generate_data_make_html
-from fastunifrac.make_html_heatmap import LD_NAME, LD_HEADERS, LD_HEADERS_VER, LD_HEADERS_HOR, LD_MATRIX, LD_TRANSFORM_VALUES, LD_TABLE_TITLE
 from qiime.util import load_qiime_config, get_tmp_filename
 from os import remove
+from fastunifrac.make_html_heatmap import (LD_NAME, LD_HEADERS, LD_HEADERS_VER,
+    LD_HEADERS_HOR, LD_MATRIX, LD_TRANSFORM_VALUES, LD_TABLE_TITLE)
+from fastunifrac.make_beta_significance_heatmap import (
+    generate_headers_and_matrix, generate_dict_data, generate_data_make_html)
 
 class MakeBetaSignificanceHeatmapTest(TestCase):
     def setUp(self):
+        """Set up some test variables"""
+        # Get the tmp folder
         self.qiime_config = load_qiime_config()
         self.tmp_dir = self.qiime_config['temp_dir'] or '/tmp/'
+        # Initialize some variables
         self.input_file = get_tmp_filename(tmp_dir = self.tmp_dir)
-
         self.dict_data = {('s1', 's2'):(0.01, 0.15),
             ('s1', 's3'):(0.0, 0.01),
             ('s1', 's4'):(0.02, 0.3),
             ('s2', 's3'):(0.82, 1.0),
             ('s2', 's4'):(0.4, 1.0),
             ('s3', 's4'):(0.0, 0.01)}
-
         self.name = "Sample name"
-
         self.headers = {LD_HEADERS_VER: ['s1', 's2', 's3'],
             LD_HEADERS_HOR: ['s1', 's2', 's3', 's4']}
-
         self.matrix = [[None, 0.01, 0.0, 0.02],
             [None, None, 0.82, 0.4],
             [None, None, None, 0.0]]
-
         self.test_name = "Example test name"
-
         self._paths_to_clean_up = []
 
     def tearDown(self):
+        """Cleans up the environment once the tests finish"""
         map(remove, self._paths_to_clean_up)
 
     def test_generate_headers_and_matrix(self):
+        """The headers and the matrix is retrieved correctly"""
         obs_headers, obs_matrix = generate_headers_and_matrix(self.dict_data, 0)
 
         exp_headers = {LD_HEADERS_VER: ['s1', 's2', 's3'],
@@ -69,10 +70,13 @@ class MakeBetaSignificanceHeatmapTest(TestCase):
         self.assertEqual(obs_headers, exp_headers)
         self.assertEqual(obs_matrix, exp_matrix)
 
-        self.assertRaises(ValueError, generate_headers_and_matrix, self.dict_data, 2)
+        self.assertRaises(ValueError, generate_headers_and_matrix,
+            self.dict_data, 2)
 
     def test_generate_dict_data(self):
-        obs_dict_data = generate_dict_data(self.name, self.headers, self.matrix, self.test_name)
+        """The dictionary with the plot data is generated correctly"""
+        obs_dict_data = generate_dict_data(self.name, self.headers,
+            self.matrix, self.test_name)
 
         exp_dict_data = {LD_NAME: "Sample name",
             LD_HEADERS: {LD_HEADERS_VER: ['s1', 's2', 's3'],
@@ -91,6 +95,7 @@ class MakeBetaSignificanceHeatmapTest(TestCase):
         self.assertEqual(obs_dict_data, exp_dict_data)
 
     def test_generate_data_make_html(self):
+        """The list of dicts is generated correctly"""
         out = open(self.input_file, 'w')
         out.write(bs_file_content)
         out.close()

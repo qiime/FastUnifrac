@@ -9,16 +9,25 @@ __maintainer__ = "Jose Antonio Navas Molina"
 __email__ = "josenavasmolina@gmail.com"
 __status__ = "Development"
 
-from cogent.util.option_parsing import parse_command_line_parameters, make_option
-from fastunifrac.make_beta_significance_heatmap import make_beta_significance_heatmap
+from qiime.util import parse_command_line_parameters, make_option
+from fastunifrac.make_beta_significance_heatmap import \
+    make_beta_significance_heatmap
 import os
 
 script_info = {}
-script_info['brief_description'] = """Generates a html file with a heatmap of the beta significance output test (each pair of samples)."""
-script_info['script_description'] = """Takes a beta significance pairwise test output file (file output of beta_significance.py) and generates a html file containing the image of the heatmap of the results. [Note: The html file will not work in a browser unless the html file is placed in the output_dir]"""
-script_info['script_usage'] = [("Example", "Generate a html file named 'index.html' with the heatmap of \
-    the beta significance test results represented in 'beta_sig_output.txt' and place the images and the scripts in 'output_dir'",
-    "%prog -i beta_sig_output.txt -m mapping_file.txt -o index.html --output_dir=output_dir/")]
+script_info['brief_description'] = """Generates a html file with a heatmap of\
+ the beta significance output test (each pair of samples)."""
+script_info['script_description'] = """Takes a beta significance pairwise test\
+ output file (file output of beta_significance.py) and generates a html file\
+ containing the image of the heatmap of the results. [Note: The html file will\
+ not work in a browser unless the html file is placed in the output_dir]"""
+script_info['script_usage'] = [
+    ("Example", "Generate a html file named 'index.html' with the heatmap of " +
+    "the beta significance test results represented in 'beta_sig_output.txt' " +
+    "and place the images and the scripts in 'output_dir'",
+    "%prog -i beta_sig_output.txt -m mapping_file.txt -o index.html" + 
+    " --output_dir=output_dir")
+]
 script_info['output_description'] = ""
 script_info['required_options'] = [
     make_option('-i', '--input_fp', type="existing_filepath",

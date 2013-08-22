@@ -10,11 +10,15 @@ __email__ = "josenavasmolina@gmail.com"
 __status__ = "Development"
 
 from cogent.util.unit_test import TestCase, main
-from fastunifrac.make_distance_matrix_heatmap import get_upper_triangle, compute_quartiles, make_quartiles, generate_trans_values_dict, generate_data_make_html
-from fastunifrac.make_html_heatmap import LD_NAME, LD_HEADERS, LD_HEADERS_VER, LD_HEADERS_HOR, LD_MATRIX, LD_TRANSFORM_VALUES, LD_TABLE_TITLE
+from fastunifrac.make_html_heatmap import (LD_NAME, LD_HEADERS, LD_HEADERS_VER,
+    LD_HEADERS_HOR, LD_MATRIX, LD_TRANSFORM_VALUES, LD_TABLE_TITLE)
+from fastunifrac.make_distance_matrix_heatmap import (get_upper_triangle,
+    compute_quartiles, make_quartiles, generate_trans_values_dict,
+    generate_data_make_html)
 
 class MakeDistanceMatrixHeatmapTest(TestCase):
     def setUp(self):
+        """Set up some test variables"""
         self.dm_lines = dm_lines.splitlines()
 
         self.matrix = [[0, 1, 2, 3],
@@ -28,6 +32,7 @@ class MakeDistanceMatrixHeatmapTest(TestCase):
         [None, None, None, None]]
 
     def test_get_upper_triangle(self):
+        """The upper triangle of a matrix is retrieved correctly"""
         obs_result = get_upper_triangle(self.matrix)
         exp_result =[[None, 1, 2, 3],
             [None, None, 4, 5],
@@ -37,6 +42,7 @@ class MakeDistanceMatrixHeatmapTest(TestCase):
         self.assertEqual(obs_result, exp_result)
 
     def test_compute_quartiles(self):
+        """The quartiles are computed correctly"""
         data = [1, 2, 3, 4, 5, 6]
         lq, qmedian, uq = compute_quartiles(data)
         lq_exp = 2
@@ -61,6 +67,7 @@ class MakeDistanceMatrixHeatmapTest(TestCase):
         self.assertRaises(ValueError, compute_quartiles, data)
 
     def test_make_quartiles(self):
+        """The dict with the quartile ranges are computed correctly"""
         obs_quart = make_quartiles(self.upper_triangle)
         exp_quart ={
             (0.99, 2):(1, "(0-25%)\nLower\nquartile"),
@@ -71,6 +78,7 @@ class MakeDistanceMatrixHeatmapTest(TestCase):
         self.assertEqual(obs_quart, exp_quart)
 
     def test_generate_trans_values_dict(self):
+        """The transformation dictionary is generated correctly"""
         obs_trans_values = generate_trans_values_dict(self.upper_triangle)
         exp_trans_values = {
             (0.99, 2):(1, "(0-25%)\nLower\nquartile"),
@@ -82,6 +90,7 @@ class MakeDistanceMatrixHeatmapTest(TestCase):
         self.assertEqual(obs_trans_values, exp_trans_values)
 
     def test_generate_data_make_html(self):
+        """The dict with the plot data is generated correctly"""
         obs_data = generate_data_make_html(self.dm_lines)
 
         exp_data = {}

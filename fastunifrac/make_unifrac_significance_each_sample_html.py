@@ -79,70 +79,75 @@ PAGE_HTML = """
 """
 
 def get_html_table(d_data, title, index):
-    """
+    """Get the HTML table with the p values colored by significance
+
+    Inputs:
         d_data: dict of: {sample: (p value, p value corrected)}
         title: string which contains the table title
         index: 0 indicates p value and 1 indicates p value corrected
 
-        Returns a string which contains the html code of a table
-        which the p values are represented colored by significance.
+    Returns a string which contains the html code of a table where the p values
+        are colored by significance.
     """
+    # Check the index is in the expected range
     if index != 0 and index != 1:
         raise ValueError, "Index must be 0 or 1!"
-
-    rows = ''
-
+    # Sort the sample names
     sorted_samples = d_data.keys()
     sorted_samples.sort()
-
+    # Generate the HTML string with the rows code
+    rows = ''
     for sample in sorted_samples:
         v = d_data[sample][index]
         c = get_matrix_value(v, DICT_TRANS_VALUES)
         rows += ROW_TABLE_HTML % (sample, c, v)
-
+    # Generate the HTML string with the table code
     return TABLE_HTML % (title, rows)
 
 def get_html_legend_table():
-    """
-        Returns a string which contains the html code of a table containing the color legend.
-    """
-    rows = ''
-
+    """Get the HTML table with the color legend"""
+    # Sort the ranges
     sorted_keys = DICT_TRANS_VALUES.keys()
     sorted_keys.sort()
-
+    # Generate the HTML string with the rows code
+    rows = ''
     for key in sorted_keys[1:]:
         color = DICT_TRANS_VALUES[key][0]
         desc = DICT_TRANS_VALUES[key][1]
         rows += ROW_TABLE_LEGEND_HTML % (color, desc)
-
+    # Generate the HTML string with the table code
     return TABLE_LEGEND_HTML % (rows)
 
 def get_html_page_string(d_data, test_name):
-    """
+    """Creates the full HTML string of the page
+
+    Inputs:
         d_data: dict of: {sample: (p value, p value corrected)}
         test_name: string which contains the name of the test realized
 
-        Returns a string which contains the full page html code.
+    Returns a string which contains the full page html code.
     """
+    # Get the table with the raw values
     raw_table = get_html_table(d_data, test_name + ": Raw values", 0)
-    corrected_table = get_html_table(d_data, test_name + ": Corrected values", 1)
+    # Get the table with the corrected values
+    corrected_table = get_html_table(d_data, test_name + ": Corrected values",1)
+    # Get the table with the color legend
     leg_table = get_html_legend_table()
-
+    # Return the string with the full page html code
     return PAGE_HTML % (raw_table, corrected_table, leg_table)
 
 def make_html_file(d_data, test_name, html_fp):
-    """
+    """Creates the HTML file with the unifrac significance results
+
+    Inputs:
         d_data: dict of: {sample: (p value, p value corrected)}
         test_name: string which contains the name of the test realized
         html_fp: file path where the html file will be created
 
-        Generates a string with contains the full page html code
-        and save it in the file indicated with 'html_fp'
+    Generates the html file with the unifrac results colored by significance
     """
     #Generate the html string
     page_html_string = get_html_page_string(d_data, test_name)
-
     #Save the html file
     out = open(html_fp, 'w')
     out.write(page_html_string)

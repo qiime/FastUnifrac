@@ -10,12 +10,14 @@ __email__ = "josenavasmolina@gmail.com"
 __status__ = "Development"
 
 from cogent.util.unit_test import TestCase, main
-from fastunifrac.parse import parse_beta_significance_output_pairwise, parse_beta_significance_output_each_sample, parse_jackknife_support_file
 from qiime.util import load_qiime_config, get_tmp_filename
 from os import remove
+from fastunifrac.parse import (parse_beta_significance_output_pairwise,
+    parse_beta_significance_output_each_sample, parse_jackknife_support_file)
 
 class ParseTest(TestCase):
     def setUp(self):
+        """Set up some test variables"""
         self.qiime_config = load_qiime_config()
         self.tmp_dir = self.qiime_config['temp_dir'] or '/tmp/'
         self.input_file = get_tmp_filename(tmp_dir = self.tmp_dir)
@@ -23,9 +25,11 @@ class ParseTest(TestCase):
         self._paths_to_clean_up = []
 
     def tearDown(self):
+        """Cleans up the environment once the tests finish"""
         map(remove, self._paths_to_clean_up)
 
     def test_parse_beta_significance_output_pairwise(self):
+        """The pairwise beta significance parser works"""
         out = open(self.input_file, 'w')
         out.write(bs_lines_pairwise)
         out.close()
@@ -34,7 +38,8 @@ class ParseTest(TestCase):
 
         bs_lines = open(self.input_file, 'U')
 
-        obs_dict, obs_test_name = parse_beta_significance_output_pairwise(bs_lines)
+        obs_dict, obs_test_name = \
+            parse_beta_significance_output_pairwise(bs_lines)
 
         exp_dict = {('s1', 's2'):(0.01, 0.15),
             ('s1', 's3'):(0.0, 0.01),
@@ -48,6 +53,7 @@ class ParseTest(TestCase):
         self.assertEqual(obs_test_name, exp_test_name)
 
     def test_parse_beta_significance_output_each_sample(self):
+        """The each sample beta significance parser works"""
         out = open(self.input_file, 'w')
         out.write(bs_lines_each_sample)
         out.close()
@@ -56,7 +62,8 @@ class ParseTest(TestCase):
 
         bs_lines = open(self.input_file, 'U')
 
-        obs_dict, obs_test_name = parse_beta_significance_output_each_sample(bs_lines)
+        obs_dict, obs_test_name = \
+            parse_beta_significance_output_each_sample(bs_lines)
 
         exp_dict = {'s1':(0.01, 0.15),
             's2':(0.0, 0.01),
@@ -68,6 +75,7 @@ class ParseTest(TestCase):
         self.assertEqual(obs_test_name, exp_test_name)
 
     def test_parse_jackknife_support_file(self):
+        """The jackknife support parser works"""
         obs_dict = parse_jackknife_support_file(self.support_lines)
         exp_dict = {'trees_considered': 10,
             'support_dict': {'node0':1.0,

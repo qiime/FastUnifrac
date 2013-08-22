@@ -11,53 +11,63 @@ __status__ = "Development"
 
 from cogent.util.unit_test import TestCase, main
 from qiime.util import load_qiime_config, get_tmp_filename
-from fastunifrac.make_sample_counts_html import get_html_table, get_html_page_string, make_html_file
 from os import remove, path
+from fastunifrac.make_sample_counts_html import (get_html_table,
+    get_html_page_string, make_html_file)
 
 class MakeSampleCountsHtmlTest(TestCase):
     def setUp(self):
+        """Set up some test variables"""
         self.qiime_config = load_qiime_config()
         self.tmp_dir = self.qiime_config['temp_dir'] or '/tmp/'
 
         self.map_dict = {}
-        self.map_dict["SampleID1"] = {'Description':'SampleID1 test description',
-                                    'NumIndividuals':'100',
-                                    'BarcodeSequence':'AAAAAAAAAACT',
-                                    'LinkerPrimerSequence':'AAAAAAAAAAAAAAAAAAAAA',
-                                    'ExampleHeader1':'Value1',
-                                    'ExampleHeader2':'Val2'}
-        self.map_dict["SampleID2"] = {'Description':'SampleID2 test description',
-                                    'NumIndividuals':'200',
-                                    'BarcodeSequence':'AAAAAAAAAGCT',
-                                    'LinkerPrimerSequence':'AAAAAAAAAAAAAAAAAAAAA',
-                                    'ExampleHeader1':'Value2',
-                                    'ExampleHeader2':'Val2'}
-        self.map_dict["SampleID3"] = {'Description':'SampleID3 test description',
-                                    'NumIndividuals':'300',
-                                    'BarcodeSequence':'ACGAAAAAAACT',
-                                    'LinkerPrimerSequence':'AAAAAAAAAAAAAAAAAAAAA',
-                                    'ExampleHeader1':'Value1',
-                                    'ExampleHeader2':'Val1'}
+        self.map_dict["SampleID1"] = {
+            'Description':'SampleID1 test description',
+            'NumIndividuals':'100',
+            'BarcodeSequence':'AAAAAAAAAACT',
+            'LinkerPrimerSequence':'AAAAAAAAAAAAAAAAAAAAA',
+            'ExampleHeader1':'Value1',
+            'ExampleHeader2':'Val2'}
+        self.map_dict["SampleID2"] = {
+            'Description':'SampleID2 test description',
+            'NumIndividuals':'200',
+            'BarcodeSequence':'AAAAAAAAAGCT',
+            'LinkerPrimerSequence':'AAAAAAAAAAAAAAAAAAAAA',
+            'ExampleHeader1':'Value2',
+            'ExampleHeader2':'Val2'}
+        self.map_dict["SampleID3"] = {
+            'Description':'SampleID3 test description',
+            'NumIndividuals':'300',
+            'BarcodeSequence':'ACGAAAAAAACT',
+            'LinkerPrimerSequence':'AAAAAAAAAAAAAAAAAAAAA',
+            'ExampleHeader1':'Value1',
+            'ExampleHeader2':'Val1'}
 
         self.mapping_file_lines = mapping_file_lines.splitlines()
 
         self._paths_to_clean_up = []
 
     def tearDown(self):
+        """Cleans up the environment once the tests finish"""
         map(remove, self._paths_to_clean_up)
 
     def test_get_html_table(self):
+        """The HTML table is correct"""
         obs = get_html_table(self.map_dict)
         self.assertEqual(obs, exp_get_html_table)
 
     def test_get_html_page_string(self):
+        """The HTML page is correct"""
         obs = get_html_page_string(self.map_dict)
         self.assertEqual(obs, exp_get_html_page_string)
 
     def test_make_html_file(self):
+        """The HTML file is created in the right location"""
         html_fp = get_tmp_filename(tmp_dir = self.tmp_dir)
         make_html_file(self.mapping_file_lines, html_fp)
-        self.assertTrue(path.exists(html_fp), 'The html file was not created in the appropiate location')
+        self.assertTrue(path.exists(html_fp),
+            'The html file was not created in the appropiate location')
 
 exp_get_html_table = """<table cellpadding=3 cellspacing=3 border=1>
 <tr><td colspan=3 class="header">Sample counts</td></tr>

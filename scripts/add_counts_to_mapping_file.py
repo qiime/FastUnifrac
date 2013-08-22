@@ -9,7 +9,7 @@ __maintainer__ = "Jose Antonio Navas Molina"
 __email__ = "josenavasmolina@gmail.com"
 __status__ = "Development"
 
-from cogent.util.option_parsing import parse_command_line_parameters, make_option
+from qiime.util import parse_command_line_parameters, make_option
 from fastunifrac.add_counts_to_mapping import add_counts_to_mapping
 
 script_info = {}

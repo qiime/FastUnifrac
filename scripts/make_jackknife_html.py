@@ -9,17 +9,25 @@ __maintainer__ = "Jose Antonio Navas Molina"
 __email__ = "josenavasmolina@gmail.com"
 __status__ = "Development"
 
-from cogent.util.option_parsing import parse_command_line_parameters, make_option
+from qiime.util import parse_command_line_parameters, make_option
 from qiime.parse import parse_newick, PhyloNode, parse_mapping_file_to_dict
 from fastunifrac.newick_to_asciiArt import make_jackknife_tree_html_file
 from fastunifrac.parse import parse_jackknife_support_file
 import os
 
 script_info = {}
-script_info['brief_description'] = """Generates a html file with the result tree of jackknife."""
-script_info['script_description'] = """Takes the Jackknife support file and the Jackknife named nodes tree and generates a html file showing the tree colored by Jackknife fraction."""
-script_info['script_usage'] = [("Example", "Generate a html file named 'index.html' with the the Jackknife tree represented in 'jackknife_named_nodes.tre' colored by Jackknife fraction stored in 'jackknife_support.txt'.",
-    "%prog -s jackknife_support -t jackknife_named_nodes.tre -m mapping_file.txt -o index.html --output_dir=output_directory")]
+script_info['brief_description'] = """Generates a html file with the result\
+ tree of jackknife."""
+script_info['script_description'] = """Takes the Jackknife support file and the\
+ Jackknife named nodes tree and generates a html file showing the tree colored\
+ by Jackknife fraction."""
+script_info['script_usage'] = [
+    ("Example", "Generate a html file named 'index.html' with the the " + 
+        "Jackknife tree represented in 'jackknife_named_nodes.tre' colored by "+
+        "Jackknife fraction stored in 'jackknife_support.txt'.",
+        "%prog -s jackknife_support -t jackknife_named_nodes.tre -m " + 
+        "mapping_file.txt -o index.html --output_dir=output_directory")
+]
 script_info['output_description'] = ""
 script_info['required_options'] = [
     make_option('-s', '--support_fp', type="existing_filepath",
@@ -68,4 +76,5 @@ if __name__ == '__main__':
     mapping_data = parse_mapping_file_to_dict(open(mapping_fp, 'U'))
 
     # Generate the html file
-    make_jackknife_tree_html_file(tree, support, DICT_TRANS_VALUES, mapping_data, html_fp, output_dir)
+    make_jackknife_tree_html_file(tree, support, DICT_TRANS_VALUES,
+        mapping_data, html_fp, output_dir)

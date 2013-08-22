@@ -23,7 +23,9 @@ DICT_TRANS_VALUES = {(None, None) : (0, ""),
             (0.1, None): (5, "(>0.1)\nNot\nsignificant")}
 
 def generate_headers_and_matrix(d_data, index):
-    """
+    """Generates the headers and the matrix values for plotting
+
+    Inputs:
         d_data: dict of: {(sample 1, sample 2),(p value, p value corrected)}
         index: 0 indicates p value and 1 indicates p value corrected
 
@@ -31,6 +33,7 @@ def generate_headers_and_matrix(d_data, index):
             headers: dict of: {HEADERS_VER:[], HEADERS_HOR:[]}
             result: list of lists containing the float values to plot
     """
+    # Check that index is one of the supported values
     if index != 0 and index != 1:
         raise ValueError, "Index must be 0 or 1!"
 
@@ -60,19 +63,26 @@ def generate_headers_and_matrix(d_data, index):
     return headers, result
 
 def generate_dict_data(name, headers, matrix, test_name):
-    """
-        Return dict of:
-            {
-                LD_NAME: plot_name,
-                LD_HEADERS: {LD_HEADERS_VER:[], LD_HEADERS_HOR:[]},
-                LD_MATRIX : list of lists containing the float values to plot
-                LD_TRANSFORM_VALUES: {(val1, val2) : (plot_value, label)}
-                    must have a key of form (None, None)
-                    Is a dictionary which allows to transform the continue matrix 
-                    values into a discrete values to plot.
-                LD_TABLE_TITLE: table_title
-            }
-            Contains all the needed information to generate the html file.
+    """Generates a dict with the info needed for the plots
+
+    Inputs:
+        name: str with the title of the plot
+        headers: dict of: {HEADERS_VER:[], HEADERS_HOR:[]}
+        matrix: list of lists containing the float values to plot
+        test_name: str with the conducted test name
+
+    Return dict of:
+        {
+            LD_NAME: plot_name,
+            LD_HEADERS: {LD_HEADERS_VER:[], LD_HEADERS_HOR:[]},
+            LD_MATRIX : list of lists containing the float values to plot
+            LD_TRANSFORM_VALUES: {(val1, val2) : (plot_value, label)}
+                must have a key of form (None, None)
+                Is a dictionary which allows to transform the continue
+                matrix values into a discrete values to plot.
+            LD_TABLE_TITLE: table_title
+        }
+        Contains all the needed information to generate the html file.
     """
     result = {}
     result[LD_NAME] = name
@@ -85,19 +95,23 @@ def generate_dict_data(name, headers, matrix, test_name):
 
 
 def generate_data_make_html(bs_lines):
-    """
-        Return list of dicts of:
-            {
-                LD_NAME: plot_name,
-                LD_HEADERS: {LD_HEADERS_VER:[], LD_HEADERS_HOR:[]},
-                LD_MATRIX : list of lists containing the float values to plot
-                LD_TRANSFORM_VALUES: {(val1, val2) : (plot_value, label)}
-                    must have a key of form (None, None)
-                    Is a dictionary which allows to transform the continue matrix 
-                    values into a discrete values to plot.
-                LD_TABLE_TITLE: table_title
-            }
-            Contains all the needed information to generate the html file.
+    """Parses the beta significance file and returns the info in a list of dicts
+
+    Inputs:
+        bs_lines: beta significance results open file object
+
+    Returns list of dicts of:
+        {
+            LD_NAME: plot_name,
+            LD_HEADERS: {LD_HEADERS_VER:[], LD_HEADERS_HOR:[]},
+            LD_MATRIX : list of lists containing the float values to plot
+            LD_TRANSFORM_VALUES: {(val1, val2) : (plot_value, label)}
+                must have a key of form (None, None)
+                Is a dictionary which allows to transform the continue
+                matrix values into a discrete values to plot.
+            LD_TABLE_TITLE: table_title
+        }
+        Contains all the needed information to generate the html file.
     """
     result = []
 
@@ -106,12 +120,23 @@ def generate_data_make_html(bs_lines):
     raw_headers, raw_matrix = generate_headers_and_matrix(dict_data, 0)
     corr_headers, corr_matrix = generate_headers_and_matrix(dict_data, 1)
 
-    result.append(generate_dict_data("Raw values", raw_headers, raw_matrix, test_name))
-    result.append(generate_dict_data("Corrected values", corr_headers, corr_matrix, test_name))
+    result.append(generate_dict_data("Raw values", raw_headers, raw_matrix,
+        test_name))
+    result.append(generate_dict_data("Corrected values", corr_headers,
+        corr_matrix, test_name))
 
     return result
 
-def make_beta_significance_heatmap(beta_significance_fp, mapping_fp, html_fp, output_dir):
+def make_beta_significance_heatmap(beta_significance_fp, mapping_fp, html_fp,
+    output_dir):
+    """Creates an html file with the heatmaps of beta significance analysis
+    
+    Inputs:
+        beta_significance_fp: beta significance results filepath
+        mapping_fp: mapping filepath
+        html_fp: output html filepath
+        output_dir: output directory where the aux html files will be stored
+    """
     bs_lines = open(beta_significance_fp, 'U')
 
     l_data = generate_data_make_html(bs_lines)

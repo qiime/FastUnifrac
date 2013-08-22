@@ -1,11 +1,5 @@
 #!/usr/bin/env python
 
-"""
-    NOTE: The html file generated in optimized for its usage on Galaxy. It will 
-        NOT work in a browser by itself unless the html file (html_fp) is placed
-        in the output_dir directory.
-"""
-
 __author__ = "Jose Antonio Navas Molina"
 __copyright__ = "Copyright 2013, The FastUniFrac Project"
 __credits__ = ["Jose Antonio Navas Molina"]
@@ -33,11 +27,9 @@ LD_TABLE_TITLE = 'table_title'
 
 # HTML strings
 # (adapted from Jesse Stombaugh and Micah Hamady's code in make_2d_plots.py)
-AREA_SRC = """<AREA shape="circle" coords="%d,%d,%d" href="#%s"  \
-onmouseover="return overlib('%s');" onmouseout="return nd();">\n"""
+AREA_SRC = """<AREA shape="circle" coords="%d,%d,%d" href="#%s"  onmouseover="return overlib('%s');" onmouseout="return nd();">\n"""
 
-IMG_MAP_SRC = """<img src="%s" border="0" ismap usemap="#points%s" width="%d" \
-height="%d" />\n"""
+IMG_MAP_SRC = """<img src="%s" border="0" ismap usemap="#points%s" width="%d" height="%d" />\n"""
 
 MAP_SRC = """
 <MAP name="points%s">
@@ -74,13 +66,15 @@ PAGE_HTML = """
 """
 
 def get_coords(headers, matrix, plot, mapping_data):
-    """
+    """Get XY plot coordinates for showing labels
+
     Inputs:
         headers: {LD_HEADERS_VER:[], LD_HEADERS_HOR:[]}
             used to generate the map label
         matrix: list of lists containing the float values plotted
             used to generate the map label
         plot: heatmap source. Used to get the html coordinates of the map
+        mapping_data: dictionary with the mapping file information
 
     Returns:
         all_cids: orderd list with all the map labels
@@ -92,16 +86,16 @@ def get_coords(headers, matrix, plot, mapping_data):
     all_cids = []
     all_xcoords = []
     all_ycoords = []
+    # Get the plot's tansform function
     plot.set_transform(plot.axes.transData)
     trans = plot.get_transform()
-
+    # Loop through the upper triangle cells
     for j in range(len(headers[LD_HEADERS_VER])):
         for i in range(len(headers[LD_HEADERS_HOR])):
             if matrix[j][i] is not None:
                 # Matplotlib interprets rows as columns, so we flip i, j
                 icoord = trans.transform((i,j))
                 xcoord, ycoord = icoord
-
                 # Build the string with the descriptions of the samples
                 sampleID_1 = headers[LD_HEADERS_VER][j]
                 sampleID_2 = headers[LD_HEADERS_HOR][i]
@@ -111,7 +105,7 @@ def get_coords(headers, matrix, plot, mapping_data):
                     mapping_data[0][sampleID_1]['Description']
                 str_desc += "<br><br><i>" + sampleID_2 + ":</i> " + \
                     mapping_data[0][sampleID_2]['Description']
-                
+                # Add current data to lists
                 all_cids.append(str_desc)
                 all_xcoords.append(xcoord)
                 all_ycoords.append(ycoord)
@@ -119,7 +113,8 @@ def get_coords(headers, matrix, plot, mapping_data):
     return all_cids, all_xcoords, all_ycoords
 
 def generate_xmap(x_len, y_len, headers, matrix, plot, mapping_data):
-    """
+    """Generates the AREA html tag for pop-up labels
+
     Inputs:
         x_len: number of x samples in the plot (width)
         y_len: number of y samples in the plot (height)
@@ -128,6 +123,7 @@ def generate_xmap(x_len, y_len, headers, matrix, plot, mapping_data):
         matrix: list of lists containing the float values plotted
             used to generate the map label
         plot: heatmap source. Used to get the html coordinates of the map
+        mapping_data: dictionary with the mapping file information
 
     Returns:
         xmap: list with AREA html string for the map
@@ -153,7 +149,7 @@ def generate_xmap(x_len, y_len, headers, matrix, plot, mapping_data):
     return xmap, img_height, img_width
 
 def get_html_table_string(data, mapping_data, output_dir):
-    """
+    """Creates an HTML table with the plot on it
     Inputs:
         data: dict of:
             {
@@ -167,65 +163,33 @@ def get_html_table_string(data, mapping_data, output_dir):
                 LD_TABLE_TITLE: table_title
             }
         output_dir: output directory where the images and scripts will be saved
+        mapping_data: dictionary with the mapping file information
 
-    Returns a string with an HTML table with the heatmap
+    Returns string with the html code
 
     Based in Jesse Stombaugh and Micah Hamady's code in make_2d_plots.py
     """
     # Create the heatmap
     width, height, plot = plot_heatmap(data[LD_NAME], data[LD_HEADERS],
         data[LD_MATRIX], data[LD_TRANSFORM_VALUES], output_dir)
-
     # Create the map for the heatmap image
     xmap, img_height, img_width = generate_xmap(height, width, data[LD_HEADERS],
         data[LD_MATRIX], plot, mapping_data)
-
     # Create the html string with the heatmap image source information
     img_src = IMG_MAP_SRC % (data[LD_NAME] + '.png', data[LD_NAME], img_width,
         img_height)
-
     # Create the html string with the map information
     img_map = MAP_SRC % (data[LD_NAME], ''.join(xmap))
-
     # Create the html download link for the image in '.eps.tgz' format
     eps_link = DOWNLOAD_LINK % (data[LD_NAME] + '.eps.gz', "Download Figure")
-
     # Create the html table with the heatmap image and its map and add it to
     # the string with previous tables
     return TABLE_HTML % (data[LD_TABLE_TITLE], "<br>".join((img_src + img_map,
         eps_link)))
 
 def get_html_page_string(list_data, mapping_data, output_dir):
-    """
-    Inputs:
-        list_data: list of dicts of:
-            {
-                LD_NAME: plot_name,
-                LD_HEADERS: {LD_HEADERS_VER:[], LD_HEADERS_HOR:[]},
-                LD_MATRIX : list of lists containing the float values to plot
-                LD_TRANSFORM_VALUES: {(val1, val2) : (plot_value, label)}
-                    must have a key of form (None, None)
-                    Is a dictionary which allows to transform the continue
-                    matrix values into a discrete values to plot.
-                LD_TABLE_TITLE: table_title
-            }
-            Every dict contains the necessary information for plotting
-            the heatmap
-        output_dir: output directory where the images and scripts will be saved
+    """Creates the full HTML string of the page
 
-    Returns a string with all the HTML page.
-
-    Based in Jesse Stombaugh and Micah Hamady's code in make_2d_plots.py
-    """
-    out_table = ''
-    for item in list_data:
-        out_table += get_html_table_string(item, mapping_data, output_dir)
-
-    # Create the complete html string
-    return PAGE_HTML % (out_table)
-
-def make_html_file(list_data, mapping_data, html_fp, output_dir):
-    """
     Inputs:
         list_data: list of dicts of:
             {
@@ -240,6 +204,38 @@ def make_html_file(list_data, mapping_data, html_fp, output_dir):
             }
             Every dict contains the necessary information for plotting
                 the heatmap
+        mapping_data: dictionary with the mapping file information
+        output_dir: output directory where the images and scripts will be saved
+
+    Returns string with the html code
+
+    Based in Jesse Stombaugh and Micah Hamady's code in make_2d_plots.py
+    """
+    out_table = ''
+    for item in list_data:
+        out_table += get_html_table_string(item, mapping_data, output_dir)
+
+    # Create the complete html string
+    return PAGE_HTML % (out_table)
+
+def make_html_file(list_data, mapping_data, html_fp, output_dir):
+    """Creates the HTML file with the heatmap images
+
+    Inputs:
+        list_data: list of dicts of:
+            {
+                LD_NAME: plot_name,
+                LD_HEADERS: {LD_HEADERS_VER:[], LD_HEADERS_HOR:[]},
+                LD_MATRIX : list of lists containing the float values to plot
+                LD_TRANSFORM_VALUES: {(val1, val2) : (plot_value, label)}
+                    must have a key of form (None, None)
+                    Is a dictionary which allows to transform the continue
+                    matrix values into a discrete values to plot.
+                LD_TABLE_TITLE: table_title
+            }
+            Every dict contains the necessary information for plotting
+                the heatmap
+        mapping_data: dictionary with the mapping file information
         html_fp: file path where the html file will be created
         output_dir: output directory where the images and scripts will be saved
 
@@ -247,13 +243,11 @@ def make_html_file(list_data, mapping_data, html_fp, output_dir):
         The generated html file will be saved as 'html_fp' and the images and
         the scripts will be saved in 'output_dir'
     """
+    # Get the HTML string
     page_html_string = get_html_page_string(list_data, mapping_data, output_dir)
-
-    overlib_js_fp = join(dirname(__file__), OVERLIB_JS)
-
     # Move 'overlib.js' to the output_dir
+    overlib_js_fp = join(dirname(__file__), OVERLIB_JS)
     copyfile(overlib_js_fp, join(output_dir, "overlib.js"))
-
     # Save the html file
     out = open(html_fp, "w+")
     out.write(page_html_string)
