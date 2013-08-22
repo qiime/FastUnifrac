@@ -15,19 +15,19 @@
 		convert_unifrac_sample_mapping_to_otu_table.py -i $sample_id_file -o otu_table.biom;
 		#if $use_abundance_weights.weights:
 			#if $use_abundance_weights.normalized:
-				echo -e "beta_diversity:metrics\tweighted_normalized_unifrac" >> param_file.txt;
+				echo "beta_diversity:metrics\tweighted_normalized_unifrac" >> param_file.txt;
 				#set filename = 'weighted_normalized_unifrac_pc.txt'
 			#else:
-				echo -e "beta_diversity:metrics\tweighted_unifrac" >> param_file.txt;
+				echo "beta_diversity:metrics\tweighted_unifrac" >> param_file.txt;
 				#set filename = 'weighted_unifrac_pc.txt'
 			#end if
 		#else:
-			echo -e "beta_diversity:metrics\tweighted_unifrac" >> param_file.txt;
+			echo "beta_diversity:metrics\tunweighted_unifrac" >> param_file.txt;
 			#set filename = 'unweighted_unifrac_pc.txt'
 		#end if
-		echo -e "make_2d_plots:scree\tTrue" >> param_file.txt;
+		echo "make_2d_plots:scree\tTrue" >> param_file.txt;
 		beta_diversity_through_plots.py -i otu_table.biom -m mapping.txt -t $tree_file -o $output_html.files_path -p param_file.txt --suppress_3d_plots;
-		make_emperor.py -i $output_html.files_path/ -m mapping.txt -o $output_html.files_path;
+		make_emperor.py -i $output_html.files_path/$filename -m mapping.txt -o $output_html.files_path;
 		make_pcoa_html.py -o $output_html -d $output_html.files_path;
 	</command>
 	<inputs>

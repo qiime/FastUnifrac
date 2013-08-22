@@ -16,16 +16,16 @@
 		#if $use_abundance_weights.weights:
 			#if $use_abundance_weights.normalized:
 				#set jack_dir='./output/weighted_normalized_unifrac/upgma_cmp/'
-				echo -e "beta_diversity:metrics\tweighted_normalized_unifrac" >> param_file.txt;
+				echo "beta_diversity:metrics\tweighted_normalized_unifrac" >> param_file.txt;
 			#else:
 				#set jack_dir='./output/weighted_unifrac/upgma_cmp/'
-				echo -e "beta_diversity:metrics\tweighted_unifrac" >> param_file.txt;
+				echo "beta_diversity:metrics\tweighted_unifrac" >> param_file.txt;
 			#end if
 		#else:
 			#set jack_dir='./output/unweighted_unifrac/upgma_cmp/'
-			echo -e "beta_diversity:metrics\tweighted_unifrac" >> param_file.txt;
+			echo "beta_diversity:metrics\tunweighted_unifrac" >> param_file.txt;
 		#end if
-		echo -e "multiple_rarefactions_even_depth:num-reps\t$permutations" >> param_file.txt
+		echo "multiple_rarefactions_even_depth:num-reps\t$permutations" >> param_file.txt;
 		jackknifed_beta_diversity.py -i otu_table.biom -o ./output -e $num_sec -m mapping.txt -t $tree_file -p param_file.txt;
 		make_jackknife_html.py -s $jack_dir/jackknife_support.txt -t $jack_dir/jackknife_named_nodes.tre -m mapping.txt -o $output_html --output_dir=$output_html.files_path;
 		copy_data.py -i $jack_dir/jackknife_named_nodes.tre -o $output_jack_tree

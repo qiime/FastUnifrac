@@ -32,7 +32,7 @@
 				copy_data.py -i $unifrac_output -o $output_html;
 				exit 1
 			#end if
-		#else if str($type_of_test) == "each_sample":
+		#else:
 			beta_significance.py -i otu_table.biom -o $unifrac_output -t $tree_file -n $u_permutations -k $type_of_test
 			#if $use_abundance_weights.weights:
 				#if $use_abundance_weights.normalized:
@@ -43,7 +43,9 @@
 			#else:  
 				-s unweighted_unifrac;
 			#end if
-			make_unifrac_significance_each_sample_html.py -i $unifrac_output -o $output_html_indiv
+			#if str($type_of_test) == "each_sample":
+				make_unifrac_significance_each_sample_html.py -i $unifrac_output -o $output_html_indiv
+			#end if
 		#end if
 	</command>
 	<inputs>

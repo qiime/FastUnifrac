@@ -13,11 +13,11 @@
 	<command>
 		convert_category_map_to_id_map.py -i $category_map_file -o mapping.txt;
 		convert_unifrac_sample_mapping_to_otu_table.py -i $sample_id_file -o otu_table.biom;
-		per_library_stats.py -i otu_table.biom -o per_lib_stats_output.txt -m mapping.txt
+		add_counts_to_mapping_file.py -i otu_table.biom -m mapping.txt -o mapping_w_counts.txt
         #if not $weights:
             --otu_counts
         #end if
-        ;make_sample_counts_html.py -m per_lib_stats_output.txt -o $html_output
+        ;make_sample_counts_html.py -m mapping_w_counts.txt -o $html_output
 	</command>
 	<inputs>
 		<param name="tree_file" type="data" label="Select reference tree"/>
