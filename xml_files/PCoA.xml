@@ -1,0 +1,99 @@
+<!--
+	author = Jose Antonio Navas Molina
+	copyright = Copyright 2013, The FastUniFrac Project
+	credits = Jose Antonio Navas Molina
+	license = GPL
+	version = 1.7.0-dev
+	maintainer = Jose Antonio Navas Molina
+	email = josenavasmolina@gmail.com
+	status = Development
+-->
+<tool id="pcoa" name="PCoA" version="1.7.0-dev">
+	<description>Uses the UniFrac metric to perform principal coordinates analysis on your samples, allowing you to see whether different types of samples are separated in different dimensions.</description>
+	<command>
+		check_id_map.py -m $category_map_file -s -o check_output;
+		#from os.path import join, basename
+		#set $mapping_fp = join('check_output', basename(str($category_map_file)) + '_corrected.txt')
+		convert_unifrac_sample_mapping_to_otu_table.py -i $sample_id_file -o otu_table.biom;
+		#if $use_abundance_weights.weights:
+			#if $use_abundance_weights.normalized:
+				echo "beta_diversity:metrics\tweighted_normalized_unifrac" >> param_file.txt;
+				#set filename = 'weighted_normalized_unifrac_pc.txt'
+			#else:
+				echo "beta_diversity:metrics\tweighted_unifrac" >> param_file.txt;
+				#set filename = 'weighted_unifrac_pc.txt'
+			#end if
+		#else:
+			echo "beta_diversity:metrics\tunweighted_unifrac" >> param_file.txt;
+			#set filename = 'unweighted_unifrac_pc.txt'
+		#end if
+		echo "make_2d_plots:scree\tTrue" >> param_file.txt;
+		beta_diversity_through_plots.py -i otu_table.biom -m $mapping_fp -t $tree_file -o $output_html.files_path -p param_file.txt --suppress_3d_plots;
+		make_emperor.py -i $output_html.files_path/$filename -m $mapping_fp -o $output_html.files_path;
+		make_pcoa_html.py -o $output_html -d $output_html.files_path;
+	</command>
+	<inputs>
+		<param name="tree_file" type="data" label="Select reference tree"/>
+		<param name="sample_id_file" type="data" label="Select sample ID mapping file"/>
+		<param name="category_map_file" type="data" label="Select category mapping file"/>
+
+		<conditional name="use_abundance_weights">
+			<param name="weights" type="boolean" default="False" label="Use abundance weights"/>
+			<when value="true">
+				<param name="normalized" type="boolean" default="false" label="Normalized"/>
+			</when>
+		</conditional>
+	</inputs>
+	<outputs>
+		<data format="html" name="output_html"/>
+	</outputs>
+	<stdio>
+		<exit_code range="1:" level="fatal"/>
+	</stdio>
+	<help>
+The **PCoA** option performs Principal Coordinates Analysis. PCoA is a multivariate statistical technique for finding the most important axes along which your samples vary. It can also be used to find clusters.
+
+PCoA calculates the distance matrix for each pair of samples using the UniFrac metrics as described for Cluster Samples. It then turns these distances into points in a space with a number of dimensions one less than the number of samples. The principal components, in descending order, describe how much of the variation each of the aces in this new space explains. The first principal component separates out the data as much as possible, the second principal component provided the next most separation, and so forth.
+
+-------------
+Output format
+-------------
+
+Since there are several options for the PCoA output format, the output is an html file with a list of links to the different output formats:
+
+.. image:: ./static/images/fastunifrac/pcoa/output_link_list.jpg
+
+The **2D continuous coloring plots** link plots the following principal components against each other for each sample: P1 vs P2, P3 vs P2, and P1 vs P3. The names of the two principal components that contribute to each graph are written in the tittle. Samples are binned according to the category mapping file.
+
+Samples that have similar values of a particular principal coordinate will appear close together on the corresponding axis. Each axis indicates the fraction of the variance in the data that the axis accounts for. Larger values mean that the axis explains more of the variance in the data; values sum 100% for all principal components. It is fairly common for the first principal component to explain a small percentage of the variance when many diverse factors affect the samples.
+
+In the last row of plots tou can see the scree plot (fraction of variance explained by each axis in red, cumulative variance in blue). This plot can tell you how many axes are likely to be important and help determine how many "real" underlying gradients there might be in your data as well as their relative "strength".
+
+Move your mouse over each point in the PCoA plots to see the sample ID and his value for the given category in the category mapping file.
+
+In the following example, there was four different categories in the mapping file, so the output is four rows of the three different combinations of the three first principal components (P1 vs P2, P3 vs P2, and P1 vs P3) plus the scree plot in the fifth row.
+
+.. image:: ./static/images/fastunifrac/pcoa/2D_continuous_coloring.jpg
+
+The **2D discrete coloring plots** link are the same plots as the 2D continuous coloring plots but using a different color palette.
+
+.. image:: ./static/images/fastunifrac/pcoa/2D_discrete_coloring.jpg
+
+The **3D continuous coloring plots** link allows you to see a 3D plot using the KiNG Applet.
+
+.. image:: ./static/images/fastunifrac/pcoa/3D_continuous_coloring.jpg
+
+The **3D discrete coloring plots** are the same plots as the 3D continuous coloring plot but using a different color palette.
+
+.. image:: ./static/images/fastunifrac/pcoa/3D_discrete_coloring.jpg
+
+Finally, the three last links **Download raw PCoA data**, **Download kinemage continuous coloring** and **Download kinemage discrete coloring**, allow you to download a tab-delimited text file containing the raw PCoA data and the Kinemage files containing the multidimensional PCoA data used by the KiNG Applet, respectively.
+
+---------------------
+Use abundance weights
+---------------------
+
+When the **No** option is selected is uses the standard unweighted UniFrac algorithm to perform the calculations. If the **Yes** option is selected, it uses the weighted UniFrac algorithm; when the weighted sub-option **Normalized** is selected, it performs a normalization step in the weighted UniFrac value calculation, whereas the **Non-normalized** option this normalization is not applied.
+
+	</help>
+</tool>

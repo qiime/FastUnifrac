@@ -1,0 +1,91 @@
+<!--
+	author = Jose Antonio Navas Molina
+	copyright = Copyright 2013, The FastUniFrac Project
+	credits = Jose Antonio Navas Molina
+	license = GPL
+	version = 1.7.0-dev
+	maintainer = Jose Antonio Navas Molina
+	email = josenavasmolina@gmail.com
+	status = Development
+-->
+<tool id="jackknife_sample_clusters" name="Jackknife Sample Clusters" version="1.7.0-dev">
+	<description>Performs statistical resampling and will allow you to see how confident you should be in the sample clustering results.</description>
+	<command>
+		check_id_map.py -m $category_map_file -s -o check_output;
+		#from os.path import join, basename
+		#set $mapping_fp = join('check_output', basename(str($category_map_file)) + '_corrected.txt')
+		convert_unifrac_sample_mapping_to_otu_table.py -i $sample_id_file -o otu_table.biom;
+		#if $use_abundance_weights.weights:
+			#if $use_abundance_weights.normalized:
+				#set jack_dir='./output/weighted_normalized_unifrac/upgma_cmp/'
+				echo "beta_diversity:metrics\tweighted_normalized_unifrac" >> param_file.txt;
+			#else:
+				#set jack_dir='./output/weighted_unifrac/upgma_cmp/'
+				echo "beta_diversity:metrics\tweighted_unifrac" >> param_file.txt;
+			#end if
+		#else:
+			#set jack_dir='./output/unweighted_unifrac/upgma_cmp/'
+			echo "beta_diversity:metrics\tunweighted_unifrac" >> param_file.txt;
+		#end if
+		echo "multiple_rarefactions_even_depth:num-reps\t$permutations" >> param_file.txt;
+		jackknifed_beta_diversity.py -i otu_table.biom -o ./output -e $num_sec -m $mapping_fp -t $tree_file -p param_file.txt;
+		make_jackknife_html.py -s $jack_dir/jackknife_support.txt -t $jack_dir/jackknife_named_nodes.tre -m $mapping_fp -o $output_html --output_dir=$output_html.files_path;
+		copy_data.py -i $jack_dir/jackknife_named_nodes.tre -o $output_jack_tree
+	</command>
+	<inputs>
+		<param name="tree_file" type="data" label="Select reference tree"/>
+		<param name="sample_id_file" type="data" label="Select sample ID mapping file"/>
+		<param name="category_map_file" type="data" label="Select category mapping file"/>
+		<param name="num_sec" type="integer" label="Number of sequences to keep" value="12"/>
+		<param name="permutations" type="select" label="Number of permutations">
+			<option value="10">10</option>
+			<option value="50">50</option>
+			<option value="100">100</option>
+			<option value="1000">1000</option>
+		</param>
+		<conditional name="use_abundance_weights">
+			<param name="weights" type="boolean" default="False" label="Use abundance weights"/>
+			<when value="true">
+				<param name="normalized" type="boolean" default="false" label="Normalized"/>
+			</when>
+		</conditional>
+	</inputs>
+	<outputs>
+		<data format="txt" name="output_jack_tree" />
+		<data format="html" name="output_html"/>
+	</outputs>
+	<stdio>
+		<exit_code range="1:" level="fatal" />
+	</stdio>
+	<help>
+**Jackknife Sample Clusters** performs jackknife analysis of sample clusters produced with the methods described for the Cluster Samples Analysis option. It can be used to determine how robust the analysis is to botg sample size and evenness by assessing how often the cluster nodes are recovered when smaller, even sets of sequences are sampled from the samples. Jackknifing is a statistical resampling technique that asks whether you would see the same results using only a random sample of part of the data. To perform this analysis, we randomly sample a specified number of sequences from each sample and re-cluster the data. We do this a number of times depending on what is set for **Number of permutations** and calculate the fraction of the times that each node in the cluster was recovered.
+
+------------------------
+Minimum sequence to keep
+------------------------
+
+**Minimum sequences to keep** specifies the number of sequences that are kept from each sample in the tree during each jackknife replicate. The sequences are randomly selected for inclusion during each replicate. If a sample contains less than the specified number of sequences, all the sequences from that sample are removed, resulting in exclusion of that sample in the cluster output. Because of this, it is often best to select a number that is less than or equal to the minimum number of sequences in any one sample. This maximum recommended value is automatically set as the default. You can view the number of sequences in each sample with the Sample Counts Analysis option.
+
+The most reasonable value to use is about 75% of the smallest sample you want to include in the analysis, but in practice people usually just use the smallest sample (despite the fact that there is then no resampling performed on that sample).
+
+----------------------
+Number of permutations
+----------------------
+
+The **Number of Permutations** option specifies the number of jackknife replicates to perform, (i.e. the number of times to randomly resample the sequences and re-do the sample clustering when calculating the support for each cluster node). This number is limited for guest users.
+
+---------------------
+Use abundance weights
+---------------------
+
+When the **No** option is selected, it uses the standard unweighted UniFrac algorithm to perform the calculations. If the **Yes** option is selected, it uses the weighted UniFrac algorithm; when the weighted sub-option **Normalized** is selected, it performs a normalization step in the weighted UniFrac value calculation, whereas the **Non-normalized** option this normalization is not applied.
+
+-------------
+Output format
+-------------
+
+The output is the same type of tree used in Cluster Samples, except that nodes are colored according to the fraction of the random samples that they were recovered in. Move your mouse over the internal nodes to get the jackknife support or move your mouse over the sample IDs to get the sample descriptions (if you've supplied this information in the category mapping file).
+
+.. image:: ./static/images/fastunifrac/jackknife_sample_clusters/output_example.jpg
+	</help>
+</tool>

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<toolbox>
+  <section name="Get Data" id="getext">
+    <tool file="fastunifrac/upload.xml"/>
+  </section>
+  <section name="FastUniFrac" id="fastunifrac">
+    <tool file="fastunifrac/cluster_samples.xml"/>
+    <tool file="fastunifrac/jackknife_sample_clusters.xml"/>
+    <tool file="fastunifrac/PCoA.xml"/>
+    <tool file="fastunifrac/p_test_significance.xml"/>
+    <tool file="fastunifrac/sample_counts.xml"/>
+    <tool file="fastunifrac/sample_distance_matrix.xml"/>
+    <tool file="fastunifrac/unifrac_significance.xml"/>
+  </section>
+</toolbox>

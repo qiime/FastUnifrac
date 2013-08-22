@@ -1,0 +1,62 @@
+<!--
+	author = Jose Antonio Navas Molina
+	copyright = Copyright 2013, The FastUniFrac Project
+	credits = Jose Antonio Navas Molina
+	license = GPL
+	version = 1.7.0-dev
+	maintainer = Jose Antonio Navas Molina
+	email = josenavasmolina@gmail.com
+	status = Development
+-->
+<tool id="sample_distance_matrix" name="Sample Distance Matrix" version="1.7.0-dev">
+	<description>Shows you the UniFrac distances between each pair of samples and is used as input for sample clustering and PCoA.</description>
+	<command>
+		check_id_map.py -m $category_map_file -s -o check_output;
+		#from os.path import join, basename
+		#set $mapping_fp = join('check_output', basename(str($category_map_file)) + '_corrected.txt')
+		convert_unifrac_sample_mapping_to_otu_table.py -i $sample_id_file -o otu_table.biom;
+		beta_diversity.py -i otu_table.biom -t $tree_file -o ./output
+		#if $use_abundance_weights.weights:
+			#if $use_abundance_weights.normalized:
+				-m weighted_normalized_unifrac;
+				#set filename = 'output/weighted_normalized_unifrac_otu_table.txt'
+			#else:
+				-m weighted_unifrac;
+				#set filename = 'output/weighted_unifrac_otu_table.txt'
+			#end if
+		#else:
+			-m unweighted_unifrac;
+			#set filename = 'output/unweighted_unifrac_otu_table.txt'
+		#end if
+		copy_data.py -i $filename -o $output_distance_matrix;
+        make_distance_matrix_heatmap.py -i $output_distance_matrix -m $mapping_fp -o $output_html --output_dir=$output_html.files_path
+	</command>
+	<inputs>
+		<param name="tree_file" type="data" label="Select reference tree"/>
+		<param name="sample_id_file" type="data" label="Select sample ID mapping file"/>
+		<param name="category_map_file" type="data" label="Select category mapping file"/>
+
+		<conditional name="use_abundance_weights">
+			<param name="weights" type="boolean" default="False" label="Use abundance weights"/>
+			<when value="true">
+				<param name="normalized" type="boolean" default="false" label="Normalized"/>
+			</when>
+		</conditional>
+	</inputs>
+	<outputs>
+		<data format="txt" name="output_distance_matrix" />
+        <data format="html" name="output_html" />
+	</outputs>
+	<stdio>
+		<exit_code range="1:" level="fatal" />
+	</stdio>
+	<help>
+The **Sample Distance Matrix** option calculates the distance between all pairs of samples using the UniFrac metric as described for Cluster Samples. The matris is used as input in both the Cluster Samples and the PCoA analysis options and can be used to cluster the samples using different algorithms if desired.
+
+The output is a matrix that compares each sample to each other sample. The quartiles of UniFrac values have different colors, allowing visual comparison of similarities and distances. Note that if there are more samples in your dataset than some maximum, the interactive matrix will be suppressed.
+
+Note also that you can download a compressed, tab-delimited file containing the raw data from this matrix.
+
+.. image:: ./static/images/fastunifrac/sample_distance_matrix/output_example.jpg
+	</help>
+</tool>

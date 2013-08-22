@@ -1,0 +1,368 @@
+<html>
+<head>
+    <title>Fast UniFrac</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="fastunifrac.css" type="text/css" />
+</head>
+<body>
+    <p class="centeredImage"><img src="images/fastunifrac/index/PoweredByPycogent.jpg" width="110" height="36" align="left"/><img src="images/fastunifrac/index/fastunifrac_logo2.png" width="326" height="36"/><img src="images/fastunifrac/index/poweredbyqiime.png" width="64" height="36" align="right"/></p>
+    <p>
+        <b>Fast UniFrac</b> is a new version of <b>UniFrac</b> that is specifically designed to handle very large datasets. Like <b>UniFrac</b>, <b>Fast UniFrac</b> provides a suite of tools for the comparison of microbial communities using phylogenetic information. It takes as input a single phylogenetic tree that contains sequences derived from at least three different environmental samples, a file mapping ids used in the tree to a set of unique sample ids (same format as prior version 'environment file', and an (optional) category mapping file describing additional relationships between samples and subcategories for visualizations. For example, in a given set of gut samples, you might define subcategories for different diets, different physical locations/dates, different species, and/or different treatments like antibiotics or high fat. For sample data click <a href="#example_data_files">here</a>. For citation, click <a href="#cite_us">here</a>.
+    </p>
+
+    <p>
+        Both the UniFrac distance metric and the P test can be used to make comparisons. Both of these techniques bypass the need to choose operational taxonomic units (OTUs) based on sequence divergence prior to analysis.
+    </p>
+
+    <p><b>Fast UniFrac</b> allows you to:</p>
+
+    <ul>
+        <li>Determine if the samples in the input phylogenetic tree have significantly different microbial communities.</li>
+        <li>Cluster samples to determine whether there are environmental factors (such as temperature, pH, or salinity) that group communities together.</li>
+        <li>Determine whether system under study was sampled sufficiently to support cluster nodes.</li>
+        <li>Easily visualize the differences between samples graphically, with support for three dimensional exploration of datasets and with multiple subcategory coloring.</li>
+
+    </ul>
+
+    <p>
+        Please enter your email and password to continue. After you register you will be able to analyze up to <b>100000</b> unique sequences, up to <b>200</b> samples, and perform significance test based on up to <b>1000</b> tree permutations. 
+    </p>
+
+    <!--<p>
+        If you do not wish to register, you can analyze up to <b>50000</b> unique sequences, up to <b>100</b> samples, and perform significance test based on up to <b>10</b> tree permutations using the guest account. The guest account email is <b>guest</b> and the password is <b>guest</b>. 
+    </p>-->
+
+    <p>
+        If you wish to analyze much larger datasets than the defaults, please contact us and we will be happy to try to accommodate you.
+    </p>
+
+    <h1>Fast UniFrac tutorial</h1>
+    <h2>Introduction</h2>
+    <p>
+        This tutorial takes you through the steps of analyzing data in the Fast UniFrac web application. The purpose of this tutorial is to show you how to use the interface to find the important variables for describing phylogenetic variation among your samples: in this case, to test what types of physical or chemical factors are most important for structuring bacterial diversity. The dataset used in this tutorial includes 50 of the 464 samples analyzed in Ley, RE, Lozupone, CA, Hamady, M, Knight, R and JI Gordon. (2008). Worlds within worlds: evolution of the vertebrate gut microbiota. Nat. Rev. Microbiol. 6(10): 776-88 <a target="_blank" href="http://www.ncbi.nlm.nih.gov/pubmed/18794915?dopt=Abstract">(Pubmed)</a>. It includes sequences from 16S ribosomal RNA surveys of diverse freeliving bacterial assemblages and the guts of diverse mammals and termites. At the end of this tutorial, you should be fully equipped to test hypotheses about your own sequences.
+    </p>
+    <p>
+        Also included in this tutorial are other example files you may use to explore some of the other features of Fast UniFrac.
+    </p>
+    <h2><a name="example_data_files">Example data files</a></h2>
+    <p>
+        To use Fast UniFrac, you need three files: a tree file, a sample id mapping file, and a category mapping file. The tree file contains a phylogenetic tree, in Newick format. The sample id mapping file contains a table showing how many times each taxon (from the tree) occurred in each of your samples. The category mapping file contains additional metadata about the samples, and is a table relating each sample to parameters you have measured such as temperature, pH, etc. In general, people usually prepare the two mapping files using Excel, although it is important to save them as plain text format and not as Excel documents.
+    </p>
+    <p>
+        You can either generate your own tree file, or use one of the reference trees. The PhyloChip reference tree matches the probes on the PhyloChip and is useful for analyzing PhyloChip data; the Greengenes reference tree is from the Greengenes core set and is a phylogenetically diverse and representative set of bacteria. These trees are built using 16S rRNA, although you can use trees built from any molecule, not just the 16S, or even trees constructed from morphological or other data.
+    </p>
+    <p>
+        The sample id mapping file must be generated mapping the sequence ids in the tree file with the sample ids used in your study. In other words, exactly the same taxon names must be used in your tree and in your sample id mapping file.
+    </p>
+    <p>
+        The category mapping file maps your sample ids to additional metadata, such as subcategories, and sample descriptions. This file can be autogenerated but it is highly recommended that you generate one that is meaningful for the variation you plan to examine in your studies. For example, if you were studying the effects of diet on the gut communities of conventional and humanized mice, you might want one column indicating whether the sample was from a conventional or a humanized mouse, another column indicating whether the mouse was on a chow diet or a high-fat diet, another column containing the combination of these two columns (i.e. diet and humanized/conventional), etc.
+    </p>
+    <p>
+        In this section, several example files are listed, not all of which are used in this tutorial.
+    </p>
+    <h3>Greengenes coreset reference datasets</h3>
+    <p>
+        This is the tree and the sequences matching the Greengenes core set as of May 2009. These files are useful for mapping your sequences against known bacterial diversity.
+    </p>
+    <p class="padded"><a target="_blank" href="datasets/GreenGenesCore-May09.ref.tre.gz">1. Greengenes coreset tree (May 09)</a></p>
+    <p class="padded"><a target="_blank" href="datasets/GreenGenesCore-May09.ref.fna.zip">2. Greengenes coreset fasta (May 09)</a></p>
+    <h3>NRM data (demo subset)</h3>
+    <p>
+        These data are from the Ley et al. 2008 Nature Reviews Microbiology paper referenced above, and provide an example of mapping heterogeneous reads to the Greengenes core set tree so that the communities can be compared by UniFrac. The sample ID mapping file was generated by blasting the dataset from the paper against the Greengenes_coreset_fasta file linked above, and the category mapping file was constructed manually to provide a range of fine- and coarse-grained representations of the environmental data.
+    </p>
+    <p class="padded"><a target="_blank" href="datasets/fastunifrac_Ley_et_al_NRM_2_sample_id_map.txt.zip">1. Ley et al example sample ID mapping file</a></p>
+    <p class="padded"><a target="_blank" href="datasets/fastunifrac_Ley_et_al_NRM_3_category_map.txt.zip">2. Ley et al example category mapping file</a></p>
+    <h3>Example PhyloChip data</h3>
+    <p>
+        Example data from Sagaram et al. 2009 AEM paper <a target="_blank" href="http://www.ncbi.nlm.nih.gov/pubmed/19151177?dopt=Abstract">(Pubmed)</a> for use with PhyloChip reference tree.
+    </p>
+    <p class="padded"><a target="_blank" href="datasets/fastunifrac_Sagaram_et_al_PhyloChip_2_sample_id_map.txt.zip">1. Sagaram et al PhyloChip sample ID mapping file</a></p>
+    <p class="padded"><a target="_blank" href="datasets/fastunifrac_Sagaram_et_al_PhyloChip_3_category_map.txt.zip">2. Sagaram et al PhyloChip category mapping file</a></p>
+    <h3>Crump et al data</h3>
+    <p>
+        These sequences are from Crump et al. 1999 "Phylogenetic analysis of particle-attached and free-living bacterial communities in the Columbia river, its estuary, and the adjacent coastal ocean", AEM 65:3192 <a target="_blank" href="http://www.ncbi.nlm.nih.gov/pubmed/10388721?dopt=Abstract">(Pubmed)</a>. This dataset was used in the original online UniFrac tutorial <a target="_blank" href="http://www.ncbi.nlm.nih.gov/pubmed/16893466?dopt=Abstract">(Pubmed)</a> so are provided again here with two important changes. We provide an example category mapping file that contains additional metadata about each of the samples.
+    </p>
+    <p class="padded"><a target="_blank" href="datasets/fastunifrac_Crump_et_al_1_tree.tre.zip">1. Crump et al example tree file</a></p>
+    <p class="padded"><a target="_blank" href="datasets/fastunifrac_Crump_et_al_2_sample_id_map.txt.zip">2. Crump et al example sample ID mapping file</a></p>
+    <p class="padded"><a target="_blank" href="datasets/fastunifrac_Crump_et_al_3_category_map.txt.zip">3. Crump et al example category mapping file</a></p>
+    <h2>Megablast protocol and sample mapping generation script</h2>
+    <p>
+        The application of UniFrac to large sequence sets, such as those generated with pyrosequencing, is also limited by the computational power needed to make a de novo phylogenetic tree using standard methods, such as neighbor joining, likelihood, or parsimony methods. In order to prepare phylogenetic trees for input into UniFrac from very large datasets, we recommend using <a target="_blank" href="http://www.qiime.org">QIIME</a>. The best source for information about QIIME are the website and the QIIME paper, which you can get at the following links:
+    </p>
+    <p class="padded"><a target="_blank" href="https://github.com/qiime/qiime">1. Source code</a></p>
+    <p class="padded"><a target="_blank" href="http://www.nature.com/nmeth/journal/v7/n5/full/nmeth.f.303.html">2. QIIME allows analysis of high-throughput community sequencing data</a></p>
+    <p>The quickest way to get started with QIIME is using the <a target="_blank" href="http://qiime.org/install/virtual_box.html">virtual machine</a>.</p>
+    <p>One potential workflow for working with ñarge datasets is to use QIIME to:</p>
+    <p class="padded">1. Preprocess sequences to handle low quality reads</p>
+    <p class="padded">2. Select OTUs</p>
+    <p class="padded">3. Generate a phylogenetic tree , and then use the QIIME script <a target="_blank" href="http://qiime.org/scripts/convert_otu_table_to_unifrac_sample_mapping.html#index-0">convert_otu_table_to_unifrac_sample_mapping.py</a>, to generate the proper input files for the Fast UniFrac web interface.</p>
+    <p>
+        In the initial release of Fast UniFrac, we also described the following procedure for generating a phylogenetic tree, which is based on mapping sequences to their closest relative in a reference tree using BLAST. This functionality is now in QIIME, and we recommend using QIIME for this step, but retain this documentation below for those who may still be interested in using it
+    </p>
+    <h3>The BLAST to greengenes protocol</h3>
+    <p>
+        We illustrate that the analysis of such large sequence sets can be carried out by assigning them to their closest relative in a phylogeny of the Greengenes core set (DeSantis et al., 2006) using BLAST’s megablast protocol (Altschul et al., 1990). Below is a detailed protocol for carrying out this analysis. Note that a different BLAST database can be substituted for use with any reference tree.
+    </p>
+    <p class="padded"><b>1. Create the Greengenes BLAST database:</b></p>
+    <p class="padded">This <a target="_blank" href="datasets/GreenGenesCore-May09.ref.fna.zip">link</a> is a fasta file containing the sequences from the greengenes coreset. This fasta record can be formatted into a BLAST database using the command:</p>
+    <p class="padded_2"><code>formatdb -i GreenGenesCore-May09.ref.fna -p F -o F -n gg_coreset</code></p>
+    <p class="padded"><b>2. Perform the megablast search:</b></p>
+    <p class="padded">A fasta record of your samples can be BLASTed against the gg_coreset BLAST database created in step 1 using the following command:</p>
+    <p class="padded_2"><code>blastall -p blastn -n T -d gg_coreset -i  -e 1e-30 -b 5 -m 9 -o blast_output.txt</code></p>
+    <p class="padded">
+        Note that the -m 9 flag is essential because it specifies the hit table output format that the script below requires.<br>
+        Also note that the sequence names must conform to the following format:
+    </p>
+    <p class="padded_2"><code>sampleName Delimiter sequenceId</code></p>
+    <p class="padded">For instance, if you sequenced 2 clones from each of two samples named SA and SB, valid sequence names might be:</p>
+    <p class="padded_2">
+        <code>SA#01<br>SA#02<br>SB#01<br>SB#02</code>
+    </p>
+    <p class="padded">If you have not names the sequences according to this convention, it is possible to also use a mapping file describing which sequence is from which sample. See documentation within the code for more details on this.</p>
+    <p class="padded">
+        <b>3. Use <a target="_blank" href="datasets/create_unifrac_env_file_BLAST.py.gz">this</a> python script and the BLAST output from step 2 to create an environment file that can be used with UniFrac:</b><br>
+        Note that the PyCogent toolkit must be downloaded from <a target="_blank" href="http://sourceforge.net/projects/pycogent/">SourceForge</a> and the cogent directory should be on your PYTHONPATH.<br>
+        You can then use the code as follows:<p>
+    <p class="padded_2">
+        <code>python create_unifrac_env_file_BLAST.py &lt;blast_output.txt&gt; &lt;outfile_path.txt&gt; &lt;sample_name_delimiter&gt;</code><br><br>
+        blast_output.txt: Path to the hit tables from the BLAST searches<br>
+        outfile_path.txt: Path to where the environment file will be saved<br>
+        sample_name_delimiter: A delimiter (e.g. a #) that separates the sample name from the sequence id.
+    </p>
+    <h2>Steps</h2>
+    <p class="padded"><b>1. Create a phylogenetic tree containing sequences from samples that you would like to compare, or select a reference tree.</b></p>
+    <p class="padded">
+        The tree should be rooted, and must have branch lengths to use Fast UniFrac. Typically, the tree is rooted by including an outgroup, e.g. an archaeal sequence to root the bacteria, but we sometimes use midpoint rooting as well. If an unrooted tree is supplied, UniFrac will assign a root arbitrarily. If you have extra sequences in the tree that are not annotated by sample, they will automatically be removed from the tree when you upload the file, so the outgroup will not be included in the analysis. If no sequences appear in the tree after upload, the most likely problem is that there was an issue with your sample ID mapping file (for example, you might have used GenBank identifiers in the tree, but NCBI GIs in the sample ID mapping file, which wouldn't match each other).
+    </p>
+    <p class="padded">
+        There are many different programs that you can use for sequence alignment and/or the phylogeny include the <a target="_blank" href="http://greengenes.lbl.gov/cgi-bin/nph-NAST_align.cgi">NAST alignment tool</a>, <a target="_blank" href="http://pynast.sourceforge.net/">PyNAST</a>, <a target="_blank" href="http://www.microbesonline.org/fasttree/">FastTree</a>, <a target="_blank" href="http://www.arb-home.de/">ARB</a>, <a target="_blank" href="http://www.ebi.ac.uk/Tools/msa/clustalw2/">ClustalW</a>, <a target="_blank" href="http://www.drive5.com/muscle/">MUSCLE</a>, <a target="_blank" href="http://evolution.genetics.washington.edu/phylip.html">PHYLIP</a>, <a target="_blank" href="http://paup.csit.fsu.edu/about.html">PAUP</a>, or <a target="_blank" href="http://mrbayes.sourceforge.net/">MrBayes</a>. For 16S rRNA sequences, we prefer <a target="_blank" href="http://pynast.sourceforge.net/">PyNAST</a> for alignment. For generating trees from large dataset, we prefer <a target="_blank" href="http://www.microbesonline.org/fasttree/">FastTree</a> for de novo tree generation trees or mapping sequences to their closest relative in a reference tree. These preferred options as well as several others can be run using <a target="_blank" href="http://qiime.org/">QIIME</a>. For large datasets, it is greatly preferred to select OTUs prior to the alignment and tree building step. This cuts down on the computation time and does not have an effect on the results. Because UniFrac depends on branch lengths, it is important to look at your tree to ensure that you don't see long branches that result from misalignment rather than from long periods of evolution. At the end of this process, you can export the tree in Newick format for upload into the UniFrac interface.
+    </p>
+    <p class="padded">
+        Alternatively, you can choose one of the reference trees provided and map your sequences to this tree. This can be useful, particularly for large datasets, such as those produced by 454 pyrosequencing, since creating a single phylogenetic tree with all sequences may not be feasible with the programs listed above. One simple way to map your sequences onto their closest relatives in a reference tree is use <a target="_blank" href="http://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=ProgSelectionGuide#tab31">megablast</a>. In this tutorial, the original sequences from the NRM paper were assigned to their closest hit in the 11-Aug_2007 version of the greengenes coreset (can be downloaded from http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/). Sequences with no hit or that match with an e-value greater than e-50 were dropped from this example dataset.
+    </p>
+    <p class="padded">
+        For the purpose of this tutorial, we provide the greengenes coreset tree in Newick format that we exported from an arb database that is available for download at http://greengenes.lbl.gov/Download/Sequence_Data/Arb_databases/greengenes236469.arb.gz. A small number of sequences were added to this tree using parsimony insertion in arb so that the fasta data files and tree for the core set were in sync. The resulting tree (<a target="_blank" href="datasets/GreenGenesCore-May09.ref.tre.gz">Greengenes coreset tree (May 09)</a>) and corresponding sequences (<a target="_blank" href="datasets/GreenGenesCore-May09.ref.fna.zip">Greengenes coreset fasta (May 09)</a>) can downloaded, but please note that this tree can be imported to your history and does not need to be re-uploaded. In order to import the GreenGenes reference tree to your history follow these steps:
+        <ol>
+            <li class="padded">In the upper menu, go to Shared Data - Data Libraries:</li>
+            <img src="images/fastunifrac/index/shared_dta_libs.jpg"/>
+            <li class="padded">Then, select 'GreenGenes coreset tree (May 09):</li>
+            <img src="images/fastunifrac/index/select_greengenes.jpg"/>
+            <li class="padded">Click on the checkbox next to 'GreenGenesCore-May09.ref.tre' and, finally, on the 'Go' button:</li>
+            <img src="images/fastunifrac/index/import_greengenes.jpg"/>
+            <li class="padded">The reference tree is now in your history and you can use it.</li>
+        </ol>
+    </p>
+    <p class="padded">
+        <b>2. Create a sample ID mapping file.</b>
+    </p>
+    <p class="padded">
+        This file maps each sequence ID in the tree to the sample ID that it came from. This must be done manually (or via a script): for each sequence, type the sequence ID used in the tree, then a tab, then the sample ID that it comes from, then optionally, another tab and then the number of times each sequence was observed (sequence abundance).
+    </p>
+    <p class="padded">
+        The sequence abundance column is important if you have dereplicated the sequence data in any way (e.g. choosing OTUs and only including a representative sequence in the tree, removing exact duplicate sequences, or pre-screening clones using RFLP patterns prior to sequencing), and you are planning on using tools in the interface that consider differences in relative abundance (e.g. weighted UniFrac). It is fine to use a tree and sample ID mapping file with all of the sequences (e.g. 5 duplicate sequences in the tree each with a weight of 1 rather than 1 representative sequence with a weight of 5) and to perform abundance-based analyses, although dereplicating the data will allow you to process larger datasets.
+    </p>
+    <p class="padded">
+        For PCoA analysis, it is most convenient to name each environment so that samples of the same type have names that start with the same first 1, 3, or 5 letters or that have sample types followed by a period, hash, or plus character (this allows you to apply colors in the PCoA scatterplots later).
+    </p>
+    <p class="padded">
+        In this example, there are 50 bacterial samples from the following sample types: Surface and subsurface saline water (Sws, and Swb respectively), Nonsaline water (Nw), Saline sediments (Sse), Nonsaline sediments (Nsa), Soils (Nso), the Vertebrate gut (Vg) and the Termite gut (Tg). We'll label each sample with its 2-3 letter sample code, followed by a hash, and a unique number because our hypothesis is that the organisms from the same overall environment should be more similar to one another.
+    </p>
+    <p class="padded">
+        The following is a short snippet of a sample ID mapping file. The first column is the sequence ID, the second column is sample ID, and the last column is the number of times the sequence was observed.
+    </p>
+    <p class="padded">
+        <code>
+            150394  Tg#1249 1<br>
+            150394  Tg#1251 2<br>
+            215260  Nso#65  1<br>
+            215260  Nso#129 4<br>
+            16073   Vg#h#11 1<br>
+            ...
+        </code>
+    </p>
+    <p class="padded">
+        For the purpose of this tutorial, we provide a sample ID mapping file called <a target="_blank" href="datasets/fastunifrac_Ley_et_al_NRM_2_sample_id_map.txt.zip">fastunifrac_Ley_et_al_NRM_2_sample_id_map.txt.zip</a> sample ID mapping file.
+    </p>
+    <p class="padded">
+        <b>3.Create a category mapping file.</b>
+    </p>
+    <p class="padded">
+        The category mapping file relates sample names in the sample ID mapping file to their related meta data (defined via subcategory columns) and descriptions of where the samples came from. The descriptions can be accessed throughout the results interface in order to make them easier to interpret. The subcategory columns allow for dynamic coloring of PCoA results in the 3d viewer to determine which categories are related to which principal coordinate axes.
+    </p>
+    <p class="padded">
+        For the purpose of this tutorial, we provide a category mapping file called Ley et al example category mapping file with 4 subcategory columns that define for each sample (1) which sample type it is from (EnvType), (2) whether the sample came from a freeliving bacterial assemblage or from the gut (FreelivingGut), (3) whether the freeliving communities were saline or nonsaline (SalineNon), and whether they were from aquatic (Water) or "Particulate" samples such as soils and sediments (WaterPartic). There is also a short description of each sample in the final column.
+    </p>
+    <p class="padded">
+        The file format is tab-delimited text. The first line is a header line that must start with a "#" character.
+    </p>
+    <p class="padded">
+        Optionally, a general description of the input files can be included in the lines immediately following the header line that start with a "#". This description will be included in the upload and results screens so that relevant information can be easily accessed.
+    </p>
+    <p class="padded">
+        The first column must be named SampleID, must contain unique (short, meaningful) sample IDs containing only alphanumeric characters. (With the exception of ".", "+", and "#" characters.)
+    </p>
+    <p class="padded">
+        The second column to "n-1 th" column are subcategories. These can be anything (random assignment if you want) but each subcategory should a small number of distinct values &lt;= number of samples. There must be at least two unique values for each category.
+    </p>
+    <p class="padded">
+        The last column must be named "Description" and contains the short descriptions for the samples.
+    </p>
+    <p class="padded">
+        <code>
+            #SampleID EnvType       FreelivingGut  ... Description<br>
+            # General description of analysis line 1 (optional)<br>
+            # General description of analysis line 2 (optional)<br>
+            # ...<br>
+            Tg#1249   TermiteGut    Gut            ... Whole gut of the wood-feeding termite <br>
+            Tg#1251   TermiteGut    Gut            ... Whole gut of the fungus-growing termite Macrotermes gilvus<br>
+            Nso#65    Soil          Freeliving     ... Uncultivated agricultural soil in Wisconsin <br>
+            Nso#1209  Soil          Freeliving     ... Soil from a fertilized Switzerland plot in the DOK. <br>
+            Vg#h#111  VertebrateGut Gut            ... Feces from Angolan Colobus Monkey from the St Louis Zoo.<br>
+            ...
+        </code>
+    </p>
+    <p class="padded">
+        For the purpose of this tutorial, we provide a category mapping file called <a target="_blank" href="datasets/fastunifrac_Ley_et_al_NRM_3_category_map.txt.zip">fastunifrac_Ley_et_al_NRM_3_category_map.txt.zip</a> sample ID mapping file.
+    </p>
+    <p class="padded"><b>4. Go to the Fast UniFrac web site.</b></p>
+    <p class="padded">
+        If you're reading this tutorial, you already know how to get here. You will need to register and log in to complete the tutorial, because we restrict the number of sequences that unregistered users can analyze. The reason for this is that many of the analyses are computationally expensive, so we need to keep track of which groups are using a lot of resources to ensure fair access for everyone. Please note that if you have previously registered for the original UniFrac interface, you will have to contact microbiomehelp@colorado.edu to register for FastUniFrac. We apologize for this inconvenience.
+    </p>
+    <p class="padded"><b>5. The Fast UniFrac upload screen</b></p>
+    <p class="padded">After you have logged in, you have to upload your sample ID mapping file and your category mapping file. To get to the upload page, click 'Get data' on the Tools panel and then 'Upload file': </p>
+    <p class="padded"><img src="images/fastunifrac/index/select_upload_file.jpg"/></p>
+    <p class="padded">Then, the upload page will appear:</p>
+    <p class="padded"><img src="images/fastunifrac/index/upload_file_empty.jpg"/></p>
+    <p class="padded">
+        First, upload your sample ID mapping file. Click 'Browse' below where it says <b>File</b>, and navigate to your sample ID mapping file (in this case, <b>fastunifrac_Ley_et_al_NRM_2_sample_id_map.txt</b>). One common problem is that you might have your sample ID mapping file saved as a Word document: this will NOT work, because Word uses a proprietary file format that is difficult for other programs to read. If you are saving your sample ID mapping file from Word, remember to save it as Plain Text, NOT as Microsoft Word. If you are using Excel, save as Tab-delimited Text. At the end of this process, your screen should look like this:
+    </p>
+    <p class="padded"><img src="images/fastunifrac/index/upload_file_ready.jpg"/></p>
+    <p class="padded">Then, you're ready to click the 'Execute' button. A confirmation page will appear saying that your job has been submitted and a new dataset (in a progress state - blue color) will appear in the history panel:</p>
+    <p class="padded"><img src="images/fastunifrac/index/upload_submitted.jpg"/></p>
+    <p class="padded">
+        While the sample ID mapping is uploading, you can start with the category mapping file upload. In order to upload your category mapping file follow the above steps, but now navigate to your category mapping file (in this case, <b>fastunifrac_Ley_et_al_NRM_3_category_map.txt</b>). This file is most easily created in Excel, remember to save as Tab-delimited text.<br>
+        If you have your own tree file, you can upload it following these same steps. In this tutorial, we will use the 'GreenGenes Core - May 2009' tree, which is already on the system.
+    </p>
+    <p class="padded">Once all the files are uploaded (the datasets in the history panel are in green color) you can start any of the available analysis in Fast UniFrac.</p>
+    <p class="padded"><b>6. Measuring the overall difference between each pair of samples.</b></p>
+    <p class="padded">In order to generate the raw distances between each pair of samples using the UniFrac metric, first choose the <b>Sample Distance Matrix</b> option from the Tool panel, under the 'Fast UniFrac' section.</p>
+    <p class="padded"><img src="images/fastunifrac/index/select_sample_distance_matrix.jpg"/></p>
+    <p class="padded">On the Sample Distance Matrix page you can select the reference tree, sample ID mapping file and the category mapping file you want to use to perform the analysis. First, select the 'GreenGenes Core - May 2009' tree using the drop-down menu below 'Select reference tree'. Next, select the '1: fastunifrac_Ley_et_al_NRM_2_sample_id_map.txt' file and the '2: fastunifrac_Ley_et_al_NRM_3_category_map.txt' file using the drop-down menus below 'Select sample ID mapping file' and 'Select category mapping file', respectively. If you then click the 'Execute' button, you will get a message saying that your job has been submitted to the queue, and two new datasets will appear in the History panel. When the datasets are green (time depending on server load) you can view them clicking on the eye icon. The first dataset will display a screen like the following. containing the distance matrix that relates each pair of environments:</p>
+    <p class="padded"><img src="images/fastunifrac/sample_distance_matrix/output_example.jpg"/></p>
+    <p class="padded">
+        Moving your mouse over the matrix cells will display the raw score for that pair of samples and the sample description, to help you to more easily interpret the data.<br>
+        At the bottom of the matrix, you will see a color key and a link to download the image.
+    </p>
+    <p class="padded">This distance matrix is colored by quartile: the smallest distances (most similar pairs) are colored blue, and the largest distances (most different pairs) are colored gray. In this example, all of the distances are fairly similar (numerical values ranging from 0.68 to 0.86), indicating that any given pair of environments shares less than one third, and as little as 15%, of the total phylogenetic diversity contained by both together. However, the distance matrix by itself is often difficult to interpret: the pattern of similarities is not very clear.</p>
+    <p class="padded">The second dataset that appears in the History panel is a tab-delimited file with the raw distance matrix. You can download it by clicking on the disk icon.</p>
+    <p class="padded"><b>7. Clustering the samples.</b></p>
+    <p class="padded">It can be useful to see how the environments cluster together since there are often patterns in the clustering that could not have been determined from the pattern of significant differences alone.</p>
+    <p class="padded">Select the <b>Cluster Samples</b> option from the Tool panel, choose the reference tree, sample ID mapping and category mapping files following the steps described above and then click the 'Execute' button.</p>
+    <p class="padded"><img src="images/fastunifrac/index/cluster_samples_page.jpg"/></p>
+    <p class="padded">
+        As in the Distance Matrix case, this analysis also generates two new datasets in the History panel. The result is a tree relating the different environmental samples. The first dataset is a graphic representation of the tree and the second one is the tree in Newick format, so you can use it in other programs such as <a target="_blank" href="http://taxonomy.zoology.gla.ac.uk/rod/treeview.html">TreeView</a>.<br>
+        In the graphic representation of the tree, if you move your mouse over each sample ID, it will display the sample description, helping you more easily interpret the clustering patterns of your samples.
+    </p>
+    <p class="padded"><img src="images/fastunifrac/cluster_samples/output_example.jpg"/></p>
+    <p class="padded">In this case it is easy to see that the different sample types cluster together: for example, the termite gut sequences (Tg) form a cluster at the upper part of the plot, below them all the vertebrate gut sequences (Vg) are a clump, etc.</p>
+    <p class="padded">This figure shows the power of UniFrac: although many samples are not significantly different from one another when corrected for multiple comparisons, biologically interesting patterns still come out of the analysis.</p>
+    <p class="padded">However, to be confident that the results are correct, it is necessary to perform the <b>Jackknife Sample Clusters</b> analysis, which will sample a smaller number of sequences from each environment and tell you whether the clusters are well-supported.</p>
+    <p class="padded">When we perform this analysis with default parameters, the nodes are colored like this:</p>
+    <p class="padded"><img src="images/fastunifrac/jackknife_sample_clusters/output_example.jpg"/></p>
+    <p class="padded">This means that if 37 sequences are chosen from each sample (the maximum amount that can be resampled without dropping the smallest sample from the analysis), the best nodes are recovered between 79% and 96% of the time (colored green and yellow respectively), which means that the support for them is relatively strong.</p>
+    <p class="padded">If instead we increase the number of sequences required per sample (by changing the Minimum sequences to keep on the Jackknife Sample Clusters page), some of the samples will be discarded, and the support for the remaining clusters may change.</p>
+    <p class="padded">The most reasonable value to use for Minimum sequences to keep is about 75% of the smallest sample you want to include in the analysis, but in practice people usually just use the smallest sample (despite the fact that there is then no resampling performed on that sample).</p>
+    <p class="padded"><b>8. Perform Principal Coordinates Analysis (PCoA).</b></p>
+    <p class="padded">The cluster diagrams are useful for showing which environments are most closely related to one another, but it is also important to see if the environments are distributed along any axes of variation that can be interpreted easily (e.g. a pH or temperature gradient).</p>
+    <p class="padded">Select the <b>PCoA</b> option from the tool panel, choose the reference tree, sample ID mapping and category mapping files following the steps described above and then click the 'Execute' button.</p>
+    <p class="padded"><img src="images/fastunifrac/index/pcoa_page.jpg"/></p>
+    <p class="padded">Unlike the previous analyses, the PCoA analysis only adds one dataset to the History panel. This dataset is a summary with links to the multiple output formats of the PCoA analysis:</p>
+    <p class="padded"><img src="images/fastunifrac/pcoa/output_link_list.jpg"/></p>
+    <p class="padded">The first two links show the 2D PCoA plots (but using a different color palette), the following two link shows the 3D PCoA plots using the KiNG applet and the last three links allows you to download the raw data.</p>
+    <p class="padded">The 2D PCoA plots looks as follows:</p>
+    <p class="padded"><img src="images/fastunifrac/pcoa/2D_continuous_coloring.jpg"/></p>
+    <p class="padded">Each point is a sample, you can move your mouse over each point to get the full name and description of the sample.</p>
+    <p class="padded">In each set of three plots, the points are colored by one category of the category mapping file, which is shown as the title. Hence, it is easy to see how the different samples cluster following a given category.</p>
+    <p class="padded">In the last row you can see the scree plot (fraction of variance explained by each axis in red, cumulative variance in blue). This plot can tell you how many axes are likely to be important and help determine how many "real" underlying gradients there might be in your data as well as their relative "strength".</p>
+    <p class="padded">The 3D PCoA plots are opened through the KiNG applet, and looks something like this:</p>
+    <p class="padded"><img src="images/fastunifrac/index/king_default_view.jpg"/></p>
+    <p class="padded">
+        You'll notice several things. On the left is the main window that plots three selected axes (by default it plots the 1st, 2nd, and 3rd PC axes). You can change which axes are displayed by selecting the Choose view axes... option under the Views menu.
+    </p>
+    <p class="padded">
+        On the right you'll see two panels. The top panel changes how the samples are colored and how the axes are scaled. By default, the sample displayed here are colored by environment type, defined in the category mapping file as EnvType. Also by default, the axes are unscaled (this combination of coloring and scaling is indicated by the highlighted EnvType: UniFrac Unscaled label in the upper right panel. When the axes are scaled, the points along that axis are multiplied by the fraction of variance explained by that axis. So in this example, you'll see that PC 1 explains about 14% of the variance along this axis, while PC 2 explains about 8%. Thus if we scale the axes by clicking the EnvType: UniFrac Scaled option in the upper right, PC 1 would appear roughly twice as long as PC 2, as shown below.
+    </p>
+    <p class="padded"><img src="images/fastunifrac/index/king_scaled_view.jpg"/></p>
+    <p class="padded">If you want to color the samples differently, for example by whether the samples are from the gut or free living, we can choose the FreelivingGut: UniFrac Unscaled option to change the view to this:</p>
+    <p class="padded"><img src="images/fastunifrac/index/king_gutfree_view.jpg"/></p>
+    <p class="padded">
+        In the lower right panel, you'll see a number of items with check boxes next to them that change when you change views in the upper right. Change back to the original view by clicking the EntType: UniFrac Unscaled option in the upper right hand box. The lower right hand panel should now have four groups of check boxes: (1) Multidimensional Axes which should be off by default, (2) Primary (PC1-3 Offset Axes) which control the display of the lines and text of the first three axes (offset from the origin), (3) EnvType (49 pts) which controls the 49 sample points, and (4) EnvType Labels (49 pts) which controls the 49 sample labels. Click the group check box toggles all group members (the items listed below each) on or off.
+    </p>
+    <p class="padded">
+        Let's start by turning off all of the sample labels. After you click the check box next to the EnvType Labels (49 pts) group, you should see something like this:
+    </p>
+    <p class="padded"><img src="images/fastunifrac/index/king_label_off_view.jpg"/></p>
+    <p class="padded">
+        Notice that the labels are removed from the main display on the left and the EnvType Labels (49 pts) group collapses, hiding the group members.
+    </p>
+    <p class="padded">
+        Similarly we can control group members in the same way. If we wanted to view just the samples that belong to the Soil and VertebrateGut subgroups that we defined in the category mapping file, we can uncheck the boxes under the EnvType (49 pts) group that correspond with the other subgroups we want to hide. Once you've done that, you should see something like this:
+    </p>
+    <p class="padded"><img src="images/fastunifrac/index/king_hide_samples_view.jpg"/></p>
+    <p class="padded">Now let's turn all the samples back on clicking all of the unchecked boxes in the Env Type (49 pts) group. Once that is done, try rotating the main view in the left panel. Click and drag somewhere near the middle of the cloud of points dragging to the left and down. You should now see something like this:</p>
+    <p class="padded"><img src="images/fastunifrac/index/king_rotate_view.jpg"/></p>
+    <p class="padded">
+        Here you can now see the separation of the samples along the third axis (PC 3) as well as PC 1 and PC 2. Next let's try viewing a different set of axes, specifically PC 1, PC 3, and PC 4. First select the Choose viewing axes... option from the Views menu at top left of the screen. You should see dialog box - choose PC 3 and PC 4 for the Y and Z axes then click the Set axes button.
+    </p>
+    <p class="padded"><img src="images/fastunifrac/index/king_choose_axes_view.jpg"/></p>
+    <p class="padded">
+        In the main screen, you'll see that the primary axes are no longer relevant since we are not plotting PC 1, PC 3, and PC 4. Turn them off by clicking the Primary (PC 1-3) Offset Axes group off in the lower right panel. Then click the check box next to Multidimensional Axes group. You should then see a list of axes (PC 1 through PC 10) appear. Click the check boxes next to the PC 1 Line, PC 3 Line, and the PC 4 Line subgroups. You should see orthogonal axes appear in the main screen on the left, looking something like this:
+    </p>
+    <p class="padded"><img src="images/fastunifrac/index/king_ortho_axes_view.jpg"/></p>
+    <p class="padded">
+        Now you can see the clustering of the samples along this set of PC axes. Finally, if you want to get a quick look at the general patterns of the samples along the first 10 axes, you can simply type the forward slash character "/", or select the Parallel coordinates option under the Views menu, which will change the view to something like this:
+    </p>
+    <p class="padded"><img src="images/fastunifrac/index/king_parallel_view.jpg"/></p>
+    <p class="padded">
+        Notice that the TermiteGut (orange) and VertebrateGut (blue) separate along PC 4 (the group of orange lines at the top of PC 4). If we type the forward slash again, "/", it will toggle the main view back to our the three dimensional view. If we rotate around PC 4, we can see this separation in the view below.
+    </p>
+    <p class="padded"><img src="images/fastunifrac/index/king_pc4_view.jpg"/></p>
+    <p class="padded">There are many other useful features in the KiNG viewer that you'll have to discover on your own. Please refer to the Help menu for the User manual and additional information about the viewer.</p>
+    <h2>Congratulations!</h2>
+    <p class="padded">After working through this tutorial, you are now ready to use Fast UniFrac for your own analyses and discover the rest of the features not described in this tutorial. There are additional example files in the Example Data Files section above that you may use to explore some of the other features of Fast UniFrac. Have fun!</p>
+    <h1><a name="cite_us">About</a></h1>
+    <p><b>Principal investigator:</b></p>
+    <p>Rob Knight - rob@colorado.edu</p>
+    <p>
+        University of Colorado at Boulder <br>
+        596 UCB <br>
+        Boulder, CO 80309-0596
+    </p>
+    <p><b>Contact us:</b></p>
+    <p>Requests, suggestions, or technical issues - MicrobiomeHelp@colorado.edu</p>
+    <p><b>Developers:</b></p>
+    <p>
+        Micah Hamady - hamady@colorado.edu<br>
+        Rob Knight - rob@colorado.edu<br>
+        Catherine Lozupone - catherine.lozupone@colorado.edu<br>
+        Jose A. Navas Molina - Jose.NavasMolina@colorado.edu<br>
+        <br>
+
+        We welcome your feedback/sponsorship. Please send your comments/suggestions to MicrobiomeHelp@colorado.edu.
+    </p>
+    <p><b>Cite us:</b></p>
+    <p><a target="_blank" href="http://www.nature.com/ismej/journal/v4/n1/abs/ismej200997a.html">http://www.nature.com/ismej/journal/v4/n1/abs/ismej200997a.html</a></p>
+    <p><b>Download:</b></p>
+    <p><a target="_blank" href="http://pycogent.org">http://pycogent.org</a></p>
+    <p><b>Other software:</b></p>
+    <p>
+        <a target="_blank" href="http://bmf2.colorado.edu/unifrac/index.psp">UniFrac</a> provides a suite of tools for the comparison of microbial communities using phylogenetic information.
+    </p>
+    <p>
+        <a target="_blank" href="http://bmf2.colorado.edu/divergentset/index.psp">DivergentSet</a> uses a phyogenetic tree to guide the construction of divergent sets of sequences, and, even on a single CPU, is up to two orders of magnitude faster than the naive method of using a full distance matrix. The DivergentSet software makes it easier to perform a wide range of bioinformatics analyses, including finding significant motifs and covariations.
+    </p>
+    <p>
+        <a target="_blank" href="http://bmf2.colorado.edu/motifcluster/index.psp">MotifCluster</a> allows you to analyze motifs in a set of protein sequences, relating them to the alignment, phylogeny, and (where available) the 3D structures. It is useful for detecting remote homologies between protein families, for understanding which proteins are most likely to share functions, and for identifying residue changes that might be important for the evolution of new enzyme activities.
+    </p>
+</body>
+</html>
