@@ -11,7 +11,9 @@
 <tool id="jackknife_sample_clusters" name="Jackknife Sample Clusters" version="1.7.0-dev">
 	<description>Performs statistical resampling and will allow you to see how confident you should be in the sample clustering results.</description>
 	<command>
-		convert_category_map_to_id_map.py -i $category_map_file -o mapping.txt;
+		check_id_map.py -m $category_map_file -s -o check_output;
+		#from os.path import join, basename
+		#set $mapping_fp = join('check_output', basename(str($category_map_file)) + '_corrected.txt')
 		convert_unifrac_sample_mapping_to_otu_table.py -i $sample_id_file -o otu_table.biom;
 		#if $use_abundance_weights.weights:
 			#if $use_abundance_weights.normalized:
@@ -26,8 +28,8 @@
 			echo "beta_diversity:metrics\tunweighted_unifrac" >> param_file.txt;
 		#end if
 		echo "multiple_rarefactions_even_depth:num-reps\t$permutations" >> param_file.txt;
-		jackknifed_beta_diversity.py -i otu_table.biom -o ./output -e $num_sec -m mapping.txt -t $tree_file -p param_file.txt;
-		make_jackknife_html.py -s $jack_dir/jackknife_support.txt -t $jack_dir/jackknife_named_nodes.tre -m mapping.txt -o $output_html --output_dir=$output_html.files_path;
+		jackknifed_beta_diversity.py -i otu_table.biom -o ./output -e $num_sec -m $mapping_fp -t $tree_file -p param_file.txt;
+		make_jackknife_html.py -s $jack_dir/jackknife_support.txt -t $jack_dir/jackknife_named_nodes.tre -m $mapping_fp -o $output_html --output_dir=$output_html.files_path;
 		copy_data.py -i $jack_dir/jackknife_named_nodes.tre -o $output_jack_tree
 	</command>
 	<inputs>

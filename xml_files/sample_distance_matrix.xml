@@ -11,7 +11,9 @@
 <tool id="sample_distance_matrix" name="Sample Distance Matrix" version="1.7.0-dev">
 	<description>Shows you the UniFrac distances between each pair of samples and is used as input for sample clustering and PCoA.</description>
 	<command>
-		convert_category_map_to_id_map.py -i $category_map_file -o mapping.txt;
+		check_id_map.py -m $category_map_file -s -o check_output;
+		#from os.path import join, basename
+		#set $mapping_fp = join('check_output', basename(str($category_map_file)) + '_corrected.txt')
 		convert_unifrac_sample_mapping_to_otu_table.py -i $sample_id_file -o otu_table.biom;
 		beta_diversity.py -i otu_table.biom -t $tree_file -o ./output
 		#if $use_abundance_weights.weights:
@@ -27,7 +29,7 @@
 			#set filename = 'output/unweighted_unifrac_otu_table.txt'
 		#end if
 		copy_data.py -i $filename -o $output_distance_matrix;
-        make_distance_matrix_heatmap.py -i $output_distance_matrix -m mapping.txt -o $output_html --output_dir=$output_html.files_path
+        make_distance_matrix_heatmap.py -i $output_distance_matrix -m $mapping_fp -o $output_html --output_dir=$output_html.files_path
 	</command>
 	<inputs>
 		<param name="tree_file" type="data" label="Select reference tree"/>

@@ -11,9 +11,11 @@
 <tool id="sample_counts" name="Sample counts" version="1.7.0-dev">
 	<description>Tells you how many sequences are in each sample.</description>
 	<command>
-		convert_category_map_to_id_map.py -i $category_map_file -o mapping.txt;
+		check_id_map.py -m $category_map_file -s -o check_output;
+		#from os.path import join, basename
+		#set $mapping_fp = join('check_output', basename(str($category_map_file)) + '_corrected.txt')
 		convert_unifrac_sample_mapping_to_otu_table.py -i $sample_id_file -o otu_table.biom;
-		add_counts_to_mapping_file.py -i otu_table.biom -m mapping.txt -o mapping_w_counts.txt
+		add_counts_to_mapping_file.py -i otu_table.biom -m $mapping_fp -o mapping_w_counts.txt
         #if not $weights:
             --otu_counts
         #end if

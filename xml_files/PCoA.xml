@@ -11,7 +11,9 @@
 <tool id="pcoa" name="PCoA" version="1.7.0-dev">
 	<description>Uses the UniFrac metric to perform principal coordinates analysis on your samples, allowing you to see whether different types of samples are separated in different dimensions.</description>
 	<command>
-		convert_category_map_to_id_map.py -i $category_map_file -o mapping.txt;
+		check_id_map.py -m $category_map_file -s -o check_output;
+		#from os.path import join, basename
+		#set $mapping_fp = join('check_output', basename(str($category_map_file)) + '_corrected.txt')
 		convert_unifrac_sample_mapping_to_otu_table.py -i $sample_id_file -o otu_table.biom;
 		#if $use_abundance_weights.weights:
 			#if $use_abundance_weights.normalized:
@@ -26,8 +28,8 @@
 			#set filename = 'unweighted_unifrac_pc.txt'
 		#end if
 		echo "make_2d_plots:scree\tTrue" >> param_file.txt;
-		beta_diversity_through_plots.py -i otu_table.biom -m mapping.txt -t $tree_file -o $output_html.files_path -p param_file.txt --suppress_3d_plots;
-		make_emperor.py -i $output_html.files_path/$filename -m mapping.txt -o $output_html.files_path;
+		beta_diversity_through_plots.py -i otu_table.biom -m $mapping_fp -t $tree_file -o $output_html.files_path -p param_file.txt --suppress_3d_plots;
+		make_emperor.py -i $output_html.files_path/$filename -m $mapping_fp -o $output_html.files_path;
 		make_pcoa_html.py -o $output_html -d $output_html.files_path;
 	</command>
 	<inputs>
