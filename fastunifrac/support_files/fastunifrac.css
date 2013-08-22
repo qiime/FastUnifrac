@@ -1,0 +1,32 @@
+body{
+    margin: 10px;
+    padding: 0;
+    border: 0;
+    font: smaller verdana, "Bitstream Vera Sans", geneva, arial, helvetica, helve, sans-serif; 
+    text-align: justify;
+    background: #FFFFFF;
+}
+
+.centeredImage{
+	text-align: center;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	padding: 0px;
+}
+
+p.padded{
+	margin-left: 20px;
+}
+
+p.padded_2{
+    margin-left: 40px;
+}
+
+p.warning{
+    color: red;
+    font-weight: bold;;
+}
+
+li.padded{
+    margin-left: 40px;
+}
