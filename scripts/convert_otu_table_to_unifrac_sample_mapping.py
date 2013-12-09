@@ -12,8 +12,7 @@ __status__ = "Development"
 from biom.parse import parse_biom_table
 from qiime.util import make_option
 from qiime.util import parse_command_line_parameters
-from fastunifrac.sample_id_map_otu_table_conversion import \
-    format_unifrac_sample_mapping
+from qiime.format import format_unifrac_sample_mapping
 
 
 script_info={}

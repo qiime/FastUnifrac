@@ -15,7 +15,7 @@ from numpy import array
 from biom.table import table_factory
 from fastunifrac.sample_id_map_otu_table_conversion import (
     parse_sample_mapping, sample_mapping_to_otu_table,
-    sample_mapping_to_biom_table, format_unifrac_sample_mapping)
+    sample_mapping_to_biom_table)
 
 class SampleIdMapOtuTableConversionTests(TestCase):
     """"""
@@ -92,16 +92,6 @@ class SampleIdMapOtuTableConversionTests(TestCase):
                             ['sample.1','sample.2','sample.3'],
                             ['OTU1','OTU2'])
         self.assertEqual(actual.sortBySampleId(), exp.sortBySampleId())
-
-    def test_format_unifrac_sample_mapping(self):
-        """format sample mapping works
-        """
-        a = [[1,0,0], [0,2,4], [7,0,9.0]]
-        otu_ids = ['OTUa','OTUb','OTUc']
-        sample_ids = ['Sa','Sb','Sc']
-        result = format_unifrac_sample_mapping(sample_ids, otu_ids, a)
-        self.assertEqual(result, ['OTUa\tSa\t1', 'OTUb\tSb\t2', 'OTUb\tSc\t4', 'OTUc\tSa\t7', 'OTUc\tSc\t9.0'])
-
 
 if __name__ =='__main__':
     main()
