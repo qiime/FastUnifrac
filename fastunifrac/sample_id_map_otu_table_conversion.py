@@ -111,3 +111,14 @@ def sample_mapping_to_biom_table(lines):
         data.append([observation_idx, sample_idx, count])
     
     return table_factory(data,sample_ids,observation_ids)
+
+def format_unifrac_sample_mapping(sample_ids, otu_ids, otu_table_array):
+    """Returns a unifrac sample mapping file from output of parse_otu_table
+    """
+    out = []
+    for i, row in enumerate(otu_table_array):
+        for j, val in enumerate(row):
+            if val > 0:
+                line = [otu_ids[i], sample_ids[j], str(val)]
+                out.append('\t'.join(line))
+    return out
