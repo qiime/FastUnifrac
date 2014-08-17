@@ -12,7 +12,8 @@ __status__ = "Development"
 from biom.util import compute_counts_per_sample_stats
 from biom.parse import parse_biom_table
 from qiime.parse import parse_mapping_file
-from convert_category_map_to_id_map import write_corrected_file
+# from convert_category_map_to_id_map import write_corrected_file
+from qiime.check_id_map import write_corrected_mapping
 
 def add_counts_to_mapping(biom_lines, mapping_lines, otu_counts, output_fp):
     """Counts the number of seqs/OTUs per sample and add its to the mapping file
@@ -35,9 +36,10 @@ def add_counts_to_mapping(biom_lines, mapping_lines, otu_counts, output_fp):
     headers.insert(index, "NumIndividuals")
     for row in map_data:
         row.insert(index, str(counts_per_sample[row[0]]))
-    # Add the '#' character to the first header
-    headers[0] = '#' + headers[0]
-    # Add headers to the data
-    map_data.insert(0, headers)
+    # # Add the '#' character to the first header
+    # headers[0] = '#' + headers[0]
+    # # Add headers to the data
+    # map_data.insert(0, headers)
     # Write the corrected mapping file
-    write_corrected_file(map_data, comments, output_fp)
+    write_corrected_mapping(output_fp, headers, comments, map_data)
+    # write_corrected_file(map_data, comments, output_fp)

@@ -14,7 +14,7 @@
 		check_id_map.py -m $category_map_file -s -o check_output;
 		#from os.path import join, basename
 		#set $mapping_fp = join('check_output', basename(str($category_map_file)) + '_corrected.txt')
-		convert_unifrac_sample_mapping_to_otu_table.py -i $sample_id_file -o otu_table.biom;
+		convert_sample_id_map_to_otu_table.py -i $sample_id_file -o otu_table.biom;
 		add_counts_to_mapping_file.py -i otu_table.biom -m $mapping_fp -o mapping_w_counts.txt
         #if not $weights:
             --otu_counts
