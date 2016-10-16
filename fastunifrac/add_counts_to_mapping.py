@@ -1,3 +1,11 @@
+# -----------------------------------------------------------------------------
+# Copyright (c) 2013, The FastUnifrac Development Team.
+#
+# Distributed under the terms of the GPLv2 License.
+#
+# The full license is in the file LICENSE, distributed with this software.
+# -----------------------------------------------------------------------------
+
 from biom import load_table
 from biom.util import compute_counts_per_sample_stats
 from qiime.parse import parse_mapping_file
