@@ -17,14 +17,14 @@ script_info['brief_description'] = "Adds sequence/OTU counts to a mapping file"
 script_info['script_description'] = "Computes the sequence/OTU counts and\
  adds it to the mapping file in a new column called NumIndividuals"
 script_info['script_usage'] = [
-    ("Example", "Count the number of sequences per sample present in " + \
-        "'otu_table.biom' and add this counts to 'mapping_file.txt'", 
+    ("Example", "Count the number of sequences per sample present in " +
+        "'otu_table.biom' and add this counts to 'mapping_file.txt'",
         "%prog -i otu_table.biom -m mapping_file.txt -o mapping_w_counts.txt"),
-    ("Example", "Count the number of OTUs per sample present in " + \
-        "'otu_table.biom' and add this counts to 'mapping_file.txt'", 
-        "%prog -i otu_table.biom -m mapping_file.txt --otu_counts " + \
+    ("Example", "Count the number of OTUs per sample present in " +
+        "'otu_table.biom' and add this counts to 'mapping_file.txt'",
+        "%prog -i otu_table.biom -m mapping_file.txt --otu_counts " +
         "-o mapping_w_counts.txt")
-    ]
+]
 script_info['output_description'] = "The mapping file with the counts added"
 script_info['required_options'] = [
     make_option('-i', '--input_fp', type="existing_filepath",
@@ -36,8 +36,8 @@ script_info['required_options'] = [
 ]
 script_info['optional_options'] = [
     make_option('--otu_counts', action='store_true', default=False,
-        help='Counts are presented as number of observed OTUs per sample, ' + 
-            'rather than counts of sequences per sample [default: %default]')
+                help='Counts are presented as number of observed OTUs per sample, ' +
+                'rather than counts of sequences per sample [default: %default]')
 ]
 script_info['version'] = __version__
 
@@ -49,4 +49,4 @@ if __name__ == '__main__':
     otu_counts = opts.otu_counts
 
     add_counts_to_mapping(open(biom_fp, 'U'), open(mapping_fp, 'U'), otu_counts,
-        output_fp)
+                          output_fp)

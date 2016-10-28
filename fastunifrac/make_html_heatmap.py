@@ -65,6 +65,7 @@ PAGE_HTML = """
 </html>
 """
 
+
 def get_coords(headers, matrix, plot, mapping_data):
     """Get XY plot coordinates for showing labels
 
@@ -94,7 +95,7 @@ def get_coords(headers, matrix, plot, mapping_data):
         for i in range(len(headers[LD_HEADERS_HOR])):
             if matrix[j][i] is not None:
                 # Matplotlib interprets rows as columns, so we flip i, j
-                icoord = trans.transform((i,j))
+                icoord = trans.transform((i, j))
                 xcoord, ycoord = icoord
                 # Build the string with the descriptions of the samples
                 sampleID_1 = headers[LD_HEADERS_VER][j]
@@ -111,6 +112,7 @@ def get_coords(headers, matrix, plot, mapping_data):
                 all_ycoords.append(ycoord)
 
     return all_cids, all_xcoords, all_ycoords
+
 
 def generate_xmap(x_len, y_len, headers, matrix, plot, mapping_data):
     """Generates the AREA html tag for pop-up labels
@@ -133,7 +135,7 @@ def generate_xmap(x_len, y_len, headers, matrix, plot, mapping_data):
     Adapted from Jesse Stombaugh and Micah Hamady's code in make_2d_plots.py
     """
     all_cids, all_xcoords, all_ycoords = get_coords(headers, matrix, plot,
-        mapping_data)
+                                                    mapping_data)
 
     # Although x_len is width and y_len is height, we flip them
     # due to Matplotlib interprets rows as columns
@@ -142,11 +144,13 @@ def generate_xmap(x_len, y_len, headers, matrix, plot, mapping_data):
 
     xmap = []
     z = 6 if len(headers[HEADERS_HOR]) > 10 else 15
-    # Since all_cids, all_xcoords, all_ycoords are ordered lists we can zip them
+    # Since all_cids, all_xcoords, all_ycoords are ordered lists we can zip
+    # them
     for cid, x, y in zip(all_cids, all_xcoords, all_ycoords):
         xmap.append(AREA_SRC % (x, img_height - y, z, cid, cid))
 
     return xmap, img_height, img_width
+
 
 def get_html_table_string(data, mapping_data, output_dir):
     """Creates an HTML table with the plot on it
@@ -171,13 +175,13 @@ def get_html_table_string(data, mapping_data, output_dir):
     """
     # Create the heatmap
     width, height, plot = plot_heatmap(data[LD_NAME], data[LD_HEADERS],
-        data[LD_MATRIX], data[LD_TRANSFORM_VALUES], output_dir)
+                                       data[LD_MATRIX], data[LD_TRANSFORM_VALUES], output_dir)
     # Create the map for the heatmap image
     xmap, img_height, img_width = generate_xmap(height, width, data[LD_HEADERS],
-        data[LD_MATRIX], plot, mapping_data)
+                                                data[LD_MATRIX], plot, mapping_data)
     # Create the html string with the heatmap image source information
     img_src = IMG_MAP_SRC % (data[LD_NAME] + '.png', data[LD_NAME], img_width,
-        img_height)
+                             img_height)
     # Create the html string with the map information
     img_map = MAP_SRC % (data[LD_NAME], ''.join(xmap))
     # Create the html download link for the image in '.eps.tgz' format
@@ -185,7 +189,8 @@ def get_html_table_string(data, mapping_data, output_dir):
     # Create the html table with the heatmap image and its map and add it to
     # the string with previous tables
     return TABLE_HTML % (data[LD_TABLE_TITLE], "<br>".join((img_src + img_map,
-        eps_link)))
+                                                            eps_link)))
+
 
 def get_html_page_string(list_data, mapping_data, output_dir):
     """Creates the full HTML string of the page
@@ -218,6 +223,7 @@ def get_html_page_string(list_data, mapping_data, output_dir):
     # Create the complete html string
     return PAGE_HTML % (out_table)
 
+
 def make_html_file(list_data, mapping_data, html_fp, output_dir):
     """Creates the HTML file with the heatmap images
 
@@ -244,7 +250,8 @@ def make_html_file(list_data, mapping_data, html_fp, output_dir):
         the scripts will be saved in 'output_dir'
     """
     # Get the HTML string
-    page_html_string = get_html_page_string(list_data, mapping_data, output_dir)
+    page_html_string = get_html_page_string(
+        list_data, mapping_data, output_dir)
     # Move 'overlib.js' to the output_dir
     overlib_js_fp = join(dirname(__file__), OVERLIB_JS)
     copyfile(overlib_js_fp, join(output_dir, "overlib.js"))

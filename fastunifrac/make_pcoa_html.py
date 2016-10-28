@@ -54,6 +54,7 @@ PAGE_HTML = """<html>
 </html>
 """
 
+
 def get_dict_links(pcoa_dir):
     """Get dictionary with the HTML links to the PCoA files
 
@@ -72,7 +73,7 @@ def get_dict_links(pcoa_dir):
     """
     # Get a list of (path, name) with the PCoA directory content
     dir_content = [(join(pcoa_dir, content),
-        content) for content in listdir(pcoa_dir)]
+                    content) for content in listdir(pcoa_dir)]
     # Loop through the contents of the directory
     # searching for interesting files
     links = {}
@@ -115,6 +116,7 @@ def get_dict_links(pcoa_dir):
                     title = ' '.join(name.split('_')[:-1])
     return links, title
 
+
 def get_html_table_links(links_dict, title):
     """Get the HTML string with the table of links
 
@@ -138,6 +140,7 @@ def get_html_table_links(links_dict, title):
     # Create the HTML string with the table
     return TABLE_HTML % (title, html_rows_string)
 
+
 def get_html_string(pcoa_dir):
     """Creates the full HTML string of the page
 
@@ -155,6 +158,7 @@ def get_html_string(pcoa_dir):
     # Return the string with the full page html code
     return PAGE_HTML % (html_table_links_string)
 
+
 def make_html_file(pcoa_dir, html_fp):
     """Creates the HTML file with a table to the PCoA result links
 
@@ -163,7 +167,7 @@ def make_html_file(pcoa_dir, html_fp):
         html_fp: file path to store the output html page
 
     Generates the html file.
-    """ 
+    """
     # Get the html string
     html_string = get_html_string(pcoa_dir)
     # Save the html file

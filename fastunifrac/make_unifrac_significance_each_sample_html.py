@@ -13,12 +13,12 @@ from fastunifrac.make_heatmap import get_matrix_value
 
 """ Html code adapted from Micah Hamady's Fastunifrac code """
 
-DICT_TRANS_VALUES = {(None, None) : ("#FFFFFF", ""),
-            (None, 0.001): ("#FF8582", "(<0.001) Highly significant"),
-            (0.001, 0.01): ("#F8FE83", "(0.001-0.01) Significant"),
-            (0.01, 0.05): ("#82FF8B", "(0.01-0.05) Marginally significant"),
-            (0.05, 0.1): ("#99CCFF", "(0.05-0.1) Suggestive"),
-            (0.1, None): ("#dddddd", "(>0.1) Not significant")}
+DICT_TRANS_VALUES = {(None, None): ("#FFFFFF", ""),
+                     (None, 0.001): ("#FF8582", "(<0.001) Highly significant"),
+                     (0.001, 0.01): ("#F8FE83", "(0.001-0.01) Significant"),
+                     (0.01, 0.05): ("#82FF8B", "(0.01-0.05) Marginally significant"),
+                     (0.05, 0.1): ("#99CCFF", "(0.05-0.1) Suggestive"),
+                     (0.1, None): ("#dddddd", "(>0.1) Not significant")}
 
 ROW_TABLE_HTML = """<tr>
 <td class="row_header">%s</td>
@@ -78,6 +78,7 @@ PAGE_HTML = """
 </html>
 """
 
+
 def get_html_table(d_data, title, index):
     """Get the HTML table with the p values colored by significance
 
@@ -104,6 +105,7 @@ def get_html_table(d_data, title, index):
     # Generate the HTML string with the table code
     return TABLE_HTML % (title, rows)
 
+
 def get_html_legend_table():
     """Get the HTML table with the color legend"""
     # Sort the ranges
@@ -118,6 +120,7 @@ def get_html_legend_table():
     # Generate the HTML string with the table code
     return TABLE_LEGEND_HTML % (rows)
 
+
 def get_html_page_string(d_data, test_name):
     """Creates the full HTML string of the page
 
@@ -130,11 +133,13 @@ def get_html_page_string(d_data, test_name):
     # Get the table with the raw values
     raw_table = get_html_table(d_data, test_name + ": Raw values", 0)
     # Get the table with the corrected values
-    corrected_table = get_html_table(d_data, test_name + ": Corrected values",1)
+    corrected_table = get_html_table(
+        d_data, test_name + ": Corrected values", 1)
     # Get the table with the color legend
     leg_table = get_html_legend_table()
     # Return the string with the full page html code
     return PAGE_HTML % (raw_table, corrected_table, leg_table)
+
 
 def make_html_file(d_data, test_name, html_fp):
     """Creates the HTML file with the unifrac significance results
@@ -146,9 +151,9 @@ def make_html_file(d_data, test_name, html_fp):
 
     Generates the html file with the unifrac results colored by significance
     """
-    #Generate the html string
+    # Generate the html string
     page_html_string = get_html_page_string(d_data, test_name)
-    #Save the html file
+    # Save the html file
     out = open(html_fp, 'w')
     out.write(page_html_string)
     out.close()

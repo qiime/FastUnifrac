@@ -14,11 +14,11 @@ from qiime.parse import parse_mapping_file
 
 # Limits from fastunifrac by Hamady.
 PAIRWISE_LIMITS = {
-    '50':2,
-    '100':3,
-    '500':7,
-    '750':9,
-    '1000':10
+    '50': 2,
+    '100': 3,
+    '500': 7,
+    '750': 9,
+    '1000': 10
 }
 
 script_info = {}
@@ -34,17 +34,17 @@ script_info['script_description'] = """Specifically, the maximum number of\
 \t1000\t\t10
 """
 script_info['script_usage'] = [
-    ("Example","","%prog -i category_map.txt -p 50 -o output_file.txt")]
+    ("Example", "", "%prog -i category_map.txt -p 50 -o output_file.txt")]
 script_info['output_description'] = ""
 script_info['required_options'] = [
     make_option('-i', '--category_map_fp', type='existing_filepath',
-        help='FastUniFrac category mapping file'),
+                help='FastUniFrac category mapping file'),
     make_option('-p', '--population', type='choice',
-        choices=sorted(PAIRWISE_LIMITS.keys()),
-        help='Population size. Available values: %s' % \
-            sorted(PAIRWISE_LIMITS.keys())),
+                choices=sorted(PAIRWISE_LIMITS.keys()),
+                help='Population size. Available values: %s' %
+                sorted(PAIRWISE_LIMITS.keys())),
     make_option('-o', '--output_fp', type='new_filepath',
-        help='Output file path')
+                help='Output file path')
 ]
 script_info['optional_options'] = []
 script_info['version'] = __version__
@@ -56,15 +56,15 @@ if __name__ == '__main__':
     out_fp = opts.output_fp
 
     mapf = open(map_fp, 'U')
-    outf = open(out_fp, 'w');
+    outf = open(out_fp, 'w')
 
     mapping_data, header, comments = parse_mapping_file(mapf)
     sample_counts = len(mapping_data)
 
     if PAIRWISE_LIMITS[population] < sample_counts:
         outf.write("The maximum number of samples for 0.05 significance with" +
-            " population %s is %d: (%d given)\n" % (population,
-                PAIRWISE_LIMITS[population], sample_counts))
+                   " population %s is %d: (%d given)\n" % (population,
+                                                           PAIRWISE_LIMITS[population], sample_counts))
         outf.close()
         mapf.close()
         exit(1)
