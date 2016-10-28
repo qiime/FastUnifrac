@@ -9,7 +9,7 @@ __maintainer__ = "Cathy Lozupone"
 __email__ = "lozupone@colorado.edu"
 __status__ = "Development"
 
-from biom.parse import parse_biom_table
+import biom
 from qiime.util import make_option
 from qiime.util import parse_command_line_parameters
 from qiime.format import format_unifrac_sample_mapping
@@ -37,7 +37,7 @@ def main():
     output_fp = opts.output_fp
     verbose = opts.verbose
     
-    otu_table = parse_biom_table(open(otu_table_fp, 'U'))
+    otu_table = biom.load_table(otu_table_fp)
     result = format_unifrac_sample_mapping(otu_table.SampleIds,
                                            otu_table.ObservationIds,
                                            otu_table.iterObservationData())
