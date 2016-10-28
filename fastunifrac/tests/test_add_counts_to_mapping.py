@@ -17,6 +17,7 @@ from fastunifrac.add_counts_to_mapping import add_counts_to_mapping
 
 
 class AddCountsToMappingTest(TestCase):
+
     def setUp(self):
         """Set up some test variables"""
         fd, self.biom_fp = mkstemp(suffix='.biom')

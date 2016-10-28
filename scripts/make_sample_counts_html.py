@@ -18,16 +18,16 @@ script_info['brief_description'] = """Generates an html file with a table with\
 script_info['script_description'] = """Generates an html file with a table with\
  the results of the sample counts analysis."""
 script_info['script_usage'] = [
-	("Example", "Generate an html called 'index.html' with the sample counts" + 
-		" stored at 'per_library_stats_output_file'", 
-    	"%prog -m per_library_stats_output_file -o index.html")
+    ("Example", "Generate an html called 'index.html' with the sample counts" +
+     " stored at 'per_library_stats_output_file'",
+     "%prog -m per_library_stats_output_file -o index.html")
 ]
 script_info['output_description'] = ""
 script_info['required_options'] = [
     make_option('-m', '--mapping_fp', type='existing_filepath',
-    	help="Mapping file output from per_library_stats.py"),
+                help="Mapping file output from per_library_stats.py"),
     make_option('-o', '--output_html_fp', type='new_filepath',
-    	help="Html filepath")
+                help="Html filepath")
 ]
 script_info['optional_options'] = []
 script_info['version'] = __version__

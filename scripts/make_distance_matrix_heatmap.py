@@ -25,8 +25,8 @@ script_info['script_usage'] = [
     ("Example", "Generate a html file named 'index.html' with the heatmap of" +
         "the distance matrix represented in 'distance_matrix.txt' and place " +
         "the images and the scripts in 'output_dir'",
-        "%prog -i distance_matrix.txt -m mapping_file.txt " + 
-            "-o index.html --output_dir=output_dir/")
+        "%prog -i distance_matrix.txt -m mapping_file.txt " +
+     "-o index.html --output_dir=output_dir/")
 ]
 script_info['output_description'] = ""
 script_info['required_options'] = [
@@ -55,4 +55,4 @@ if __name__ == '__main__':
         pass
 
     make_distance_matrix_heatmap(open(dm_fp, 'U'), open(mapping_fp, 'U'),
-        html_fp, output_dir)
+                                 html_fp, output_dir)

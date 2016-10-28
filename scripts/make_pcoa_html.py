@@ -18,9 +18,9 @@ script_info['brief_description'] = """Generates a html file which shows the\
 script_info['script_description'] = """ Generates a html file which shows the\
  PCoA results."""
 script_info['script_usage'] = [
-	("Example", "Generates a html file named 'index.html' with the PCoA " + 
-		"results stored under the folder 'pcoa_output_dir'",
-    	"%prog -d pcoa_output_dir -o index.html")
+    ("Example", "Generates a html file named 'index.html' with the PCoA " +
+     "results stored under the folder 'pcoa_output_dir'",
+     "%prog -d pcoa_output_dir -o index.html")
 ]
 script_info['output_description'] = ""
 script_info['required_options'] = [

@@ -23,10 +23,10 @@ script_info['script_description'] = """Takes a file with a tree in newick\
  mapping file."""
 script_info['script_usage'] = [
     ("Example", "Generates an html file named 'tree_asciiArt_file.html' with " +
-        "the ascii representation of the tree stored at 'tree_newick_file.tre'"+
+        "the ascii representation of the tree stored at 'tree_newick_file.tre'" +
         " in newick format.",
-        "%prog -t tree_newick_file.tre -m mapping_file.txt " + 
-            "-o tree_asciiArt_file.html --output_dir=output_dir")
+        "%prog -t tree_newick_file.tre -m mapping_file.txt " +
+     "-o tree_asciiArt_file.html --output_dir=output_dir")
 ]
 script_info['output_description'] = ""
 script_info['required_options'] = [
@@ -37,8 +37,8 @@ script_info['required_options'] = [
     make_option('-o', '--html_fp', type="new_filepath",
                 help='HTML file path'),
     make_option('--output_dir', type="new_dirpath",
-                help='Output directory which will contain the scripts' + 
-                    ' for the html file')
+                help='Output directory which will contain the scripts' +
+                ' for the html file')
 ]
 script_info['optional_options'] = []
 script_info['version'] = __version__
@@ -64,4 +64,4 @@ if __name__ == '__main__':
 
     # Generate the HTML file
     make_interactive_sample_id_tree_file(tree, mapping_data, html_fp,
-        output_dir)
+                                         output_dir)
