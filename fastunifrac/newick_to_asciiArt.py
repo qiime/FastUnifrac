@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+from make_heatmap import get_matrix_value
+from shutil import copyfile
+import os
+from os.path import join, dirname
+
 __author__ = "Jose Antonio Navas Molina"
 __copyright__ = "Copyright 2013, The FastUniFrac Project"
 __credits__ = ["Jose Antonio Navas Molina"]
@@ -9,49 +14,40 @@ __maintainer__ = "Jose Antonio Navas Molina"
 __email__ = "josenavasmolina@gmail.com"
 __status__ = "Development"
 
-from make_heatmap import get_matrix_value
-from shutil import copyfile
-import os
-from os.path import join, dirname
 
 # overlib.js path
 OVERLIB_JS = "support_files/overlib.js"
 
 """Html code adapted from Micah Hamady's code at Fastunifrac website"""
 
-INTERACTIVE_ID_HTML = """<a href="#" onmouseover="return overlib('<b>Sample ID:</b> %s<br><b>Description:</b> %s');" onmouseout="return nd();">%s</a>"""
+INTERACTIVE_ID_HTML = ('<a href="#" onmouseover="return overlib(\'<b>Sample '
+                       'ID:</b> %s<br><b>Description:</b> %s\');" '
+                       'onmouseout="return nd();">%s</a>')
 
-FORMATED_HTML = """<a href="#" onmouseover="return overlib('<b>Jackknife Count:</b> %.3f<br><b>Jackknife Fraction:</b> %.3f');" onmouseout="return nd();"><font style="BACKGROUND-COLOR:%s">%s</font></a>"""
+FORMATED_HTML = ('<a href="#" onmouseover="return overlib(\'<b>Jackknife '
+                 'Count:</b> %.3f<br><b>Jackknife Fraction:</b> %.3f\');" '
+                 'onmouseout="return nd();"><font style="BACKGROUND-COLOR:%s"'
+                 '>%s</font></a>')
 
-ROW_TABLE_LEGEND_HTML = """<tr>
-<td class="normal" bgcolor="%s" nowrap>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-<td class="row_header">%s</td>
-</tr>
-"""
+ROW_TABLE_LEGEND_HTML = ('<tr>'
+                         '<td class="normal" bgcolor="%s" nowrap>'
+                         '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+                         '</td><td class="row_header">%s</td></tr>')
 
-TABLE_LEGEND_HTML = """<table cellpadding=2 cellspacing=2 border=1>
-<tr> <td colspan=2 class="header">Color description</td></tr>
-%s
-</table>
-<br>
-"""
+TABLE_LEGEND_HTML = ('<table cellpadding=2 cellspacing=2 border=1>'
+                     '<tr> <td colspan=2 class="header">Color description</td>'
+                     '</tr>%s</table><br>')
 
-PAGE_HTML = """
-<html>
-<head>
-<title>Fastunifrac</title>
-<script type="text/javascript" src="overlib.js"></script>
-<style type="text/css">
-.normal { color: black; font-family:Arial,Verdana; font-size:12; font-weight:normal;}
-.header { color: white; font-family:Arial,Verdana; font-size:12; font-weight:bold; background-color:#2C3143;}
-.row_header { color: black; font-family:Arial,Verdana; font-size:12; font-weight:bold; background-color:#C1C9E5;}
-</style>
-</head>
-<body>
-%s
-</body>
-</html>
-"""
+PAGE_HTML = ('<html><head><title>Fastunifrac</title>'
+             '<script type="text/javascript" src="overlib.js"></script>'
+             '<style type="text/css">'
+             '.normal { color: black; font-family:Arial,Verdana; font-size:12;'
+             'font-weight:normal;}'
+             '.header { color: white; font-family:Arial,Verdana; font-size:12;'
+             'font-weight:bold; background-color:#2C3143;}'
+             '.row_header { color: black; font-family:Arial,Verdana;'
+             'font-size:12; font-weight:bold; background-color:#C1C9E5;}'
+             '</style></head><body>%s</body></html>')
 
 
 def asciiArt_length(tree, char1='-'):
@@ -91,8 +87,9 @@ def asciiArt_length(tree, char1='-'):
         # Add ASCII prefixes to the children's representations
         space_str = ' ' * LEN
         space_pipe_str = ' ' * (LEN - 1) + '|'
-        prefixes = [space_str] * (low_mid + 1) + [space_pipe_str] * (high_mid -
-                                                                     low_mid - 1) + [space_str] * (len(result) - high_mid)
+        prefixes = [space_str] * (low_mid + 1) + \
+                   [space_pipe_str] * (high_mid - low_mid - 1) + \
+                   [space_str] * (len(result) - high_mid)
         if LEN < 2:
             prefixes[mid] = char1
         else:
@@ -117,8 +114,8 @@ def get_tree_by_length_string(tree):
     # Get string lines of ASCII representation of tree
     (lines, mid) = asciiArt_length(tree)
     output = []
-    output.append("Scale: 1 dash, slash, backslash ~ %.4f branch length units" %
-                  branch_scale)
+    output.append(("Scale: 1 dash, slash, backslash ~ %.4f branch "
+                   "length units" % branch_scale))
     output.extend(lines)
     return output
 
@@ -132,8 +129,10 @@ def add_interactive_sample_id(line, mapping_data, separator):
         separator: char used to separate the sample id from the line
     """
     before, sep, after = line.partition(separator)
-    return before + "&#62;" + INTERACTIVE_ID_HTML % (after,
-                                                     mapping_data[0][after]['Description'], after)
+    formatted = INTERACTIVE_ID_HTML % (after,
+                                       mapping_data[0][after]['Description'],
+                                       after)
+    return before + "&#62;" + formatted
 
 
 def make_interactive_sample_id_tree_file(tree, mapping_data, html_fp,
@@ -260,8 +259,9 @@ def asciiArt_length_html(tree, num_trees_considered, trans_values, char1="-"):
             else:
                 char2 = '-'
             # Create HTML-ASCII representation of current child
-            (child_lines, child_mid) = asciiArt_length_html(child,
-                                                            num_trees_considered, trans_values, char2)
+            (child_lines, child_mid) = \
+                asciiArt_length_html(child, num_trees_considered, trans_values,
+                                     char2)
             mids.append(len(result) + child_mid)
             result.extend(child_lines)
         # Compute mid of tree
@@ -270,10 +270,12 @@ def asciiArt_length_html(tree, num_trees_considered, trans_values, char1="-"):
         mid = (high_mid + low_mid) / 2
         # Add HTML-ASCII prefixes to the children's representation
         space_str = ' ' * LEN
-        space_pipe_str = ' ' * (LEN - 1) + get_formated_char_html("|",
-                                                                  num_trees_considered, tree.Name, trans_values)
-        prefixes = [space_str] * (low_mid + 1) + [space_pipe_str] * (high_mid -
-                                                                     low_mid - 1) + [space_str] * (len(result) - high_mid)
+        space_pipe_str = ' ' * (LEN - 1) + \
+                         get_formated_char_html("|", num_trees_considered,
+                                                tree.Name, trans_values)
+        prefixes = [space_str] * (low_mid + 1) + \
+                   [space_pipe_str] * (high_mid - low_mid - 1) + \
+                   [space_str] * (len(result) - high_mid)
         if LEN < 2:
             prefixes[mid] = char1
         else:
@@ -373,12 +375,14 @@ def make_jackknife_tree_html_file(tree, support, trans_values, mapping_data,
         html_fp: output html filepath
         output_dir: output directory which will contains scripts and images
 
-    Generates a html file stored at 'html_fp' with the HTML-ASCII representation
-    of 'tree' with the internal nodes colored by jackknife fraction.
+    Generates a html file stored at 'html_fp' with the HTML-ASCII
+    representation of 'tree' with the internal nodes colored by jackknife
+    fraction.
     """
     # Generate the string which contains the full page html code
-    tree_text_html = get_jackknife_tree_html_string(tree,
-                                                    support['trees_considered'], trans_values, mapping_data)
+    tree_text_html = \
+        get_jackknife_tree_html_string(tree, support['trees_considered'],
+                                       trans_values, mapping_data)
     # Move 'overlib.js' to the output_dir
     overlib_js_fp = join(dirname(__file__), OVERLIB_JS)
     copyfile(overlib_js_fp, os.path.join(output_dir, "overlib.js"))

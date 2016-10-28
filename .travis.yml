@@ -19,6 +19,6 @@ install:
   - travis_retry pip install . --process-dependency-links
 script:
   - nosetests --with-doctest --with-coverage -v --cover-package=fastunifrac
-  - flake8 fastunifrac/* setup.py scripts/*
+  - flake8 fastunifrac/*.py setup.py scripts/*.py
 after_success:
   - coveralls

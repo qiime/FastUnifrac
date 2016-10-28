@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+from os.path import join, isdir, isfile
+from os import listdir
+
 __author__ = "Jose Antonio Navas Molina"
 __copyright__ = "Copyright 2013, The FastUniFrac Project"
 __credits__ = ["Jose Antonio Navas Molina"]
@@ -8,9 +11,6 @@ __version__ = "1.7.0-dev"
 __maintainer__ = "Jose Antonio Navas Molina"
 __email__ = "josenavasmolina@gmail.com"
 __status__ = "Development"
-
-from os.path import join, isdir, isfile
-from os import listdir
 
 PCOA_2D_CONTINUOUS_INDEX = 0
 PCOA_2D_DISCRETE_INDEX = 1
@@ -23,36 +23,21 @@ RAW_DATA_STRING = "Download raw PCoA data (Right click - Save as)"
 
 LINK_HTML = """<a class="table_cell" target="_blank" href="%s">%s</a>"""
 
-ROW_TABLE_HTML = """<tr>
-        <td class="table_cell">%s</td>
-    </tr>
-"""
+ROW_TABLE_HTML = '<tr><td class="table_cell">%s</td></tr>'
 
-TABLE_HTML = """<table cellpadding=1 cellspacing=1 border=1>
-    <tr>
-        <td class="header">PCoA - %s</td>
-    </tr>
-    %s
-</table>
-"""
+TABLE_HTML = ('<table cellpadding=1 cellspacing=1 border=1>'
+              '<tr><td class="header">PCoA - %s</td></tr>%s</table>')
 
-PAGE_HTML = """<html>
-    <head>
-        <style type="text/css">
-            .normal { color: black; font-family:Arial,Verdana; font-size:12; font-weight:normal;}
-            .header { color: white; font-family:Arial,Verdana; font-size:12; font-weight:bold; background-color:#2C3143;}
-            .table_cell { color: black; font-family:Arial,Verdana; font-size:12; font-weight:normal; background-color:#EBD9B2;}
-            .container { overflow: hidden;}
-        </style>
-        <title>Fastunifrac</title>
-    </head>
-    <body>
-        <div>
-            %s
-        </div>
-    </body>
-</html>
-"""
+PAGE_HTML = ('<html><head><style type="text/css">'
+             '.normal { color: black; font-family:Arial,Verdana; '
+             'font-size:12; font-weight:normal;}'
+             '.header { color: white; font-family:Arial,Verdana; '
+             'font-size:12; font-weight:bold; background-color:#2C3143;}'
+             '.table_cell { color: black; font-family:Arial,Verdana; '
+             'font-size:12; font-weight:normal; background-color:#EBD9B2;}'
+             '.container { overflow: hidden;}'
+             '</style><title>Fastunifrac</title></head><body>'
+             '<div>%s</div></body></html>')
 
 
 def get_dict_links(pcoa_dir):
@@ -91,7 +76,7 @@ def get_dict_links(pcoa_dir):
                 elif split_name[-1] == 'continuous':
                     index = PCOA_2D_CONTINUOUS_INDEX
                 else:
-                    raise ValueError, 'Wrong PCoA directory structure'
+                    raise ValueError('Wrong PCoA directory structure')
                 # Search for the html file with the 2d plots
                 for content in listdir(path):
                     f = join(path, content)
