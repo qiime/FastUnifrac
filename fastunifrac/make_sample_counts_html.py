@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from qiime.parse import parse_mapping_file_to_dict
+
 __author__ = "Jose Antonio Navas Molina"
 __copyright__ = "Copyright 2013, The FastUniFrac Project"
 __credits__ = ["Jose Antonio Navas Molina"]
@@ -9,43 +11,28 @@ __maintainer__ = "Jose Antonio Navas Molina"
 __email__ = "josenavasmolina@gmail.com"
 __status__ = "Development"
 
-from qiime.parse import parse_mapping_file_to_dict
 
-ROW_TABLE_HTML = """<tr>
-    <td class="row_header">%s</td>
-    <td class="table_cell">%s</td>
-    <td class="table_cell">%s</td>
-</tr>
-"""
+ROW_TABLE_HTML = ('<tr><td class="row_header">%s</td>'
+                  '<td class="table_cell">%s</td>'
+                  '<td class="table_cell">%s</td></tr>')
 
-TABLE_HTML = """<table cellpadding=3 cellspacing=3 border=1>
-<tr><td colspan=3 class="header">Sample counts</td></tr>
-<tr>
-    <td class="header">Sample ID</td>
-    <td class="header">Count</td>
-    <td class="header">Description</td>
-</tr>
-%s
-</table>
-<br>
-"""
+TABLE_HTML = ('<table cellpadding=3 cellspacing=3 border=1>'
+              '<tr><td colspan=3 class="header">Sample counts</td></tr>'
+              '<tr><td class="header">Sample ID</td>'
+              '<td class="header">Count</td>'
+              '<td class="header">Description</td></tr>%s</table><br>')
 
-PAGE_HTML = """
-<html>
-    <head>
-        <style type="text/css">
-            .normal { color: black; font-family:Arial,Verdana; font-size:12; font-weight:normal;}
-            .header { color: white; font-family:Arial,Verdana; font-size:12; font-weight:bold; background-color:#2C3143;}
-            .row_header { color: black; font-family:Arial,Verdana; font-size:12; font-weight:bold; background-color:#C1C9E5;}
-            .table_cell { color: black; font-family:Arial,Verdana; font-size:12; font-weight:normal; background-color:#EBD9B2;}
-        </style>
-        <title>FastUniFrac</title>
-    </head>
-    <body>
-%s
-    </body>
-</html>
-"""
+PAGE_HTML = ('<html><head><style type="text/css">'
+             '.normal { color: black; font-family:Arial,Verdana; '
+             'font-size:12; font-weight:normal;}'
+             '.header { color: white; font-family:Arial,Verdana; '
+             'font-size:12; font-weight:bold; background-color:#2C3143;}'
+             '.row_header { color: black; font-family:Arial,Verdana; '
+             'font-size:12; font-weight:bold; background-color:#C1C9E5;}'
+             '.table_cell { color: black; font-family:Arial,Verdana; '
+             'font-size:12; font-weight:normal; background-color:#EBD9B2;}'
+             '</style><title>FastUniFrac</title></head>'
+             '<body>%s</body></html>')
 
 
 def get_html_table(map_dict):
