@@ -10,7 +10,7 @@ __maintainer__ = "Cathy Lozupone"
 __email__ = "lozupone@colorado.edu"
 __status__ = "Development"
 
-from biom.table import table_factory
+from biom import Table
 from string import letters, digits, maketrans
 from copy import deepcopy
 
@@ -110,4 +110,4 @@ def sample_mapping_to_biom_table(lines):
             
         data.append([observation_idx, sample_idx, count])
     
-    return table_factory(data,sample_ids,observation_ids)
+    return Table(data, observation_ids, sample_ids)

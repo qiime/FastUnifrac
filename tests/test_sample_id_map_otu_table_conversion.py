@@ -12,7 +12,7 @@ __status__ = "Development"
 
 from cogent.util.unit_test import TestCase,main
 from numpy import array
-from biom.table import table_factory
+from biom import Table
 from fastunifrac.sample_id_map_otu_table_conversion import (
     parse_sample_mapping, sample_mapping_to_otu_table,
     sample_mapping_to_biom_table)
@@ -81,16 +81,16 @@ class SampleIdMapOtuTableConversionTests(TestCase):
         """sample_mapping_to_biom_table works"""
         lines = self.SampleMapping
         actual = sample_mapping_to_biom_table(lines)
-        exp = table_factory(array([[3.,0.,2.],[1.,2.,0.]]),
-                            ['sample1','sample2','sample3'],
-                            ['OTU1','OTU2'])
+        exp = Table(array([[3.,0.,2.],[1.,2.,0.]]),
+                    ['OTU1','OTU2'],
+                    ['sample1','sample2','sample3'])
         self.assertEqual(actual.sortBySampleId(), exp.sortBySampleId())
 
         lines = self.SampleMappingNoMIENS
         actual = sample_mapping_to_biom_table(lines)
-        exp = table_factory(array([[3.,0.,2.],[1.,2.,0.]]),
-                            ['sample.1','sample.2','sample.3'],
-                            ['OTU1','OTU2'])
+        exp = Table(array([[3.,0.,2.],[1.,2.,0.]]),
+                    ['OTU1','OTU2'],
+                    ['sample.1','sample.2','sample.3'])
         self.assertEqual(actual.sortBySampleId(), exp.sortBySampleId())
 
 if __name__ =='__main__':
