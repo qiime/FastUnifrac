@@ -22,10 +22,10 @@ script_info['script_description'] = """Takes the Jackknife support file and the\
  Jackknife named nodes tree and generates a html file showing the tree colored\
  by Jackknife fraction."""
 script_info['script_usage'] = [
-    ("Example", "Generate a html file named 'index.html' with the the " + 
-        "Jackknife tree represented in 'jackknife_named_nodes.tre' colored by "+
+    ("Example", "Generate a html file named 'index.html' with the the " +
+        "Jackknife tree represented in 'jackknife_named_nodes.tre' colored by " +
         "Jackknife fraction stored in 'jackknife_support.txt'.",
-        "%prog -s jackknife_support -t jackknife_named_nodes.tre -m " + 
+        "%prog -s jackknife_support -t jackknife_named_nodes.tre -m " +
         "mapping_file.txt -o index.html --output_dir=output_directory")
 ]
 script_info['output_description'] = ""
@@ -45,12 +45,12 @@ script_info['optional_options'] = []
 script_info['version'] = __version__
 
 # Dict which contains the color legend
-DICT_TRANS_VALUES = {(None, None) : ("#FFFFFF", ""),
-            (None, 0.5): ("#dddddd", "< 50%"),
-            (0.5, 0.7): ("#99CCFF", "50-70%"),
-            (0.7, 0.9): ("#82FF8B", "70-90%"),
-            (0.9, 0.999): ("#F8FE83", "90-99.9%"),
-            (0.999, None): ("#FF8582", "> 99.9%")}
+DICT_TRANS_VALUES = {(None, None): ("#FFFFFF", ""),
+                     (None, 0.5): ("#dddddd", "< 50%"),
+                     (0.5, 0.7): ("#99CCFF", "50-70%"),
+                     (0.7, 0.9): ("#82FF8B", "70-90%"),
+                     (0.9, 0.999): ("#F8FE83", "90-99.9%"),
+                     (0.999, None): ("#FF8582", "> 99.9%")}
 
 if __name__ == '__main__':
     option_parser, opts, args = parse_command_line_parameters(**script_info)
@@ -77,4 +77,4 @@ if __name__ == '__main__':
 
     # Generate the html file
     make_jackknife_tree_html_file(tree, support, DICT_TRANS_VALUES,
-        mapping_data, html_fp, output_dir)
+                                  mapping_data, html_fp, output_dir)

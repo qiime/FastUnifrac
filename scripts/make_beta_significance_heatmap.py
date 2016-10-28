@@ -23,10 +23,10 @@ script_info['script_description'] = """Takes a beta significance pairwise test\
  not work in a browser unless the html file is placed in the output_dir]"""
 script_info['script_usage'] = [
     ("Example", "Generate a html file named 'index.html' with the heatmap of " +
-    "the beta significance test results represented in 'beta_sig_output.txt' " +
-    "and place the images and the scripts in 'output_dir'",
-    "%prog -i beta_sig_output.txt -m mapping_file.txt -o index.html" + 
-    " --output_dir=output_dir")
+     "the beta significance test results represented in 'beta_sig_output.txt' " +
+     "and place the images and the scripts in 'output_dir'",
+     "%prog -i beta_sig_output.txt -m mapping_file.txt -o index.html" +
+     " --output_dir=output_dir")
 ]
 script_info['output_description'] = ""
 script_info['required_options'] = [

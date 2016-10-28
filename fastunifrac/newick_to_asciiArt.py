@@ -53,6 +53,7 @@ PAGE_HTML = """
 </html>
 """
 
+
 def asciiArt_length(tree, char1='-'):
     """Creates a list with an ASCII representation of the tree
 
@@ -90,16 +91,17 @@ def asciiArt_length(tree, char1='-'):
         # Add ASCII prefixes to the children's representations
         space_str = ' ' * LEN
         space_pipe_str = ' ' * (LEN - 1) + '|'
-        prefixes = [space_str] * (low_mid + 1) + [space_pipe_str] * (high_mid - 
-            low_mid - 1) + [space_str] * (len(result) - high_mid)
+        prefixes = [space_str] * (low_mid + 1) + [space_pipe_str] * (high_mid -
+                                                                     low_mid - 1) + [space_str] * (len(result) - high_mid)
         if LEN < 2:
             prefixes[mid] = char1
         else:
             prefixes[mid] = char1 + '-' * (LEN - 2) + prefixes[mid][-1]
-        result = [ p + l for (p, l) in zip(prefixes, result)]
+        result = [p + l for (p, l) in zip(prefixes, result)]
         return (result, mid)
     else:
         return ([char1 + '-' * (LEN - 1) + '>' + tree.Name], 0)
+
 
 def get_tree_by_length_string(tree):
     """Generates a string with an ASCII representation of tree
@@ -116,9 +118,10 @@ def get_tree_by_length_string(tree):
     (lines, mid) = asciiArt_length(tree)
     output = []
     output.append("Scale: 1 dash, slash, backslash ~ %.4f branch length units" %
-        branch_scale)
+                  branch_scale)
     output.extend(lines)
     return output
+
 
 def add_interactive_sample_id(line, mapping_data, separator):
     """Makes the SampleID string interactive by showing its description
@@ -130,10 +133,11 @@ def add_interactive_sample_id(line, mapping_data, separator):
     """
     before, sep, after = line.partition(separator)
     return before + "&#62;" + INTERACTIVE_ID_HTML % (after,
-        mapping_data[0][after]['Description'], after)
+                                                     mapping_data[0][after]['Description'], after)
+
 
 def make_interactive_sample_id_tree_file(tree, mapping_data, html_fp,
-    output_dir):
+                                         output_dir):
     """Creates the html file with the ASCII representation of the tree
 
     Inputs:
@@ -147,7 +151,7 @@ def make_interactive_sample_id_tree_file(tree, mapping_data, html_fp,
     # Transform the ASCII representation to HTML with interactive sample ids.
     tree_html_lines = [tree_lines[0] + "<br>"]
     tree_html_lines.extend([add_interactive_sample_id(line, mapping_data, '>')
-        for line in tree_lines[1:]])
+                            for line in tree_lines[1:]])
 
     html_lines = ["<pre>"]
     html_lines.extend(tree_html_lines)
@@ -169,6 +173,7 @@ def make_interactive_sample_id_tree_file(tree, mapping_data, html_fp,
 #  tree colored by Jackknife fraction                               #
 #####################################################################
 
+
 def get_formated_char_html(char, num_trees_considered, fraction, trans_values):
     """Makes a char interactive and colors it by jackknife support
 
@@ -187,6 +192,7 @@ def get_formated_char_html(char, num_trees_considered, fraction, trans_values):
     color = get_matrix_value(fraction, trans_values)
     return FORMATED_HTML % (count, fraction, color, char)
 
+
 def get_last_char_of_html_string(html_string):
     """Returns the last char of an HTML string
 
@@ -201,6 +207,7 @@ def get_last_char_of_html_string(html_string):
         left, sep, right = html_string.rpartition("<a")
         return sep + right
     return html_string[-1]
+
 
 def remove_first_chars_of_html_string(html_string, num_chars):
     """Removes the X first chars of an HTML string
@@ -218,8 +225,9 @@ def remove_first_chars_of_html_string(html_string, num_chars):
         return html_string
     if html_string[0] == "<":
         left, sep, right = html_string.partition("</a>")
-        return remove_first_chars_of_html_string(right, num_chars-1)
-    return remove_first_chars_of_html_string(html_string[1:], num_chars-1)
+        return remove_first_chars_of_html_string(right, num_chars - 1)
+    return remove_first_chars_of_html_string(html_string[1:], num_chars - 1)
+
 
 def asciiArt_length_html(tree, num_trees_considered, trans_values, char1="-"):
     """Creates a list with an HTML-ASCII representation of the tree
@@ -245,15 +253,15 @@ def asciiArt_length_html(tree, num_trees_considered, trans_values, char1="-"):
         for child in tree.Children:
             if child is tree.Children[0]:
                 char2 = get_formated_char_html("/", num_trees_considered,
-                    tree.Name, trans_values)
+                                               tree.Name, trans_values)
             elif child is tree.Children[-1]:
                 char2 = get_formated_char_html("\\", num_trees_considered,
-                    tree.Name, trans_values)
+                                               tree.Name, trans_values)
             else:
                 char2 = '-'
             # Create HTML-ASCII representation of current child
             (child_lines, child_mid) = asciiArt_length_html(child,
-                num_trees_considered, trans_values, char2)
+                                                            num_trees_considered, trans_values, char2)
             mids.append(len(result) + child_mid)
             result.extend(child_lines)
         # Compute mid of tree
@@ -263,21 +271,22 @@ def asciiArt_length_html(tree, num_trees_considered, trans_values, char1="-"):
         # Add HTML-ASCII prefixes to the children's representation
         space_str = ' ' * LEN
         space_pipe_str = ' ' * (LEN - 1) + get_formated_char_html("|",
-            num_trees_considered, tree.Name, trans_values)
+                                                                  num_trees_considered, tree.Name, trans_values)
         prefixes = [space_str] * (low_mid + 1) + [space_pipe_str] * (high_mid -
-            low_mid - 1) + [space_str] * (len(result) - high_mid)
+                                                                     low_mid - 1) + [space_str] * (len(result) - high_mid)
         if LEN < 2:
             prefixes[mid] = char1
         else:
             prefixes[mid] = char1 + '-' * (LEN - 2) + \
                 get_last_char_of_html_string(prefixes[mid])
-        result = [ p + l for (p, l) in zip(prefixes, result)]
+        result = [p + l for (p, l) in zip(prefixes, result)]
         return (result, mid)
     else:
-        return ([char1 + '-' * (LEN-1) + '+' + tree.Name], 0)
+        return ([char1 + '-' * (LEN - 1) + '+' + tree.Name], 0)
+
 
 def draw_jackknife_tree_html(tree, num_trees_considered, trans_values,
-    mapping_data):
+                             mapping_data):
     """Generates a string with an HTML-ASCII representation of tree
 
     Inputs:
@@ -296,15 +305,16 @@ def draw_jackknife_tree_html(tree, num_trees_considered, trans_values,
     branch_scale = float(unscaled_max_length) / scaled_max_length
     # Get string lines of HTML-ASCII representation of tree
     (lines, mid) = asciiArt_length_html(tree, num_trees_considered,
-        trans_values)
+                                        trans_values)
     new_lines = [add_interactive_sample_id(line, mapping_data, '+')
-        for line in lines]
+                 for line in lines]
     output = []
-    output.append("<pre>Scale: 1 dash, slash, backslash ~ " + 
-        "%.4f branch length units<br>" % branch_scale)
+    output.append("<pre>Scale: 1 dash, slash, backslash ~ " +
+                  "%.4f branch length units<br>" % branch_scale)
     output.extend(new_lines)
     output.append("</pre>")
     return "\n".join(output)
+
 
 def get_legend_table_html(trans_values):
     """Generates HTML table with the color legend
@@ -327,8 +337,9 @@ def get_legend_table_html(trans_values):
     # Generate the html table code
     return TABLE_LEGEND_HTML % (rows)
 
+
 def get_jackknife_tree_html_string(tree, num_trees_considered, trans_values,
-    mapping_data):
+                                   mapping_data):
     """Generates the full page html code
 
     Inputs:
@@ -342,14 +353,15 @@ def get_jackknife_tree_html_string(tree, num_trees_considered, trans_values,
     """
     # Get the html code of the tree
     html_string = draw_jackknife_tree_html(tree, num_trees_considered,
-        trans_values, mapping_data)
+                                           trans_values, mapping_data)
     # Get the html code of the legend table
     html_string += get_legend_table_html(trans_values)
     # Generate the HTML code of the full page
     return PAGE_HTML % html_string
 
+
 def make_jackknife_tree_html_file(tree, support, trans_values, mapping_data,
-    html_fp, output_dir):
+                                  html_fp, output_dir):
     """Creates the HTML file with the HTML-ASCII representation of tree
 
     Inputs:
@@ -366,7 +378,7 @@ def make_jackknife_tree_html_file(tree, support, trans_values, mapping_data,
     """
     # Generate the string which contains the full page html code
     tree_text_html = get_jackknife_tree_html_string(tree,
-        support['trees_considered'], trans_values, mapping_data)
+                                                    support['trees_considered'], trans_values, mapping_data)
     # Move 'overlib.js' to the output_dir
     overlib_js_fp = join(dirname(__file__), OVERLIB_JS)
     copyfile(overlib_js_fp, os.path.join(output_dir, "overlib.js"))

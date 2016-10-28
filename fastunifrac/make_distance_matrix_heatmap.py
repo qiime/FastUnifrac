@@ -12,8 +12,9 @@ __status__ = "Development"
 from qiime.parse import parse_distmat, parse_mapping_file_to_dict
 from numpy import median
 from fastunifrac.make_html_heatmap import (make_html_file, LD_NAME, LD_HEADERS,
-    LD_HEADERS_VER, LD_HEADERS_HOR, LD_MATRIX, LD_TRANSFORM_VALUES,
-    LD_TABLE_TITLE)
+                                           LD_HEADERS_VER, LD_HEADERS_HOR, LD_MATRIX, LD_TRANSFORM_VALUES,
+                                           LD_TABLE_TITLE)
+
 
 def get_upper_triangle(matrix):
     """Sets the lower triangle and the diagonal of 'matrix' to None
@@ -29,13 +30,14 @@ def get_upper_triangle(matrix):
 
     for i in range(len(matrix)):
         row = []
-        for j in range(i+1):
+        for j in range(i + 1):
             row.append(None)
-        for j in range(i+1, len(matrix[i])):
+        for j in range(i + 1, len(matrix[i])):
             row.append(matrix[i][j])
         result.append(row)
 
     return result
+
 
 def compute_quartiles(data):
     """Compute the quartiles of data
@@ -63,9 +65,10 @@ def compute_quartiles(data):
         uq = median(data[m_ix:])
     else:
         lq = median(data[0:m_ix])
-        uq = median(data[m_ix+1:])
+        uq = median(data[m_ix + 1:])
 
     return lq, q_median, uq
+
 
 def make_quartiles(dist_mat):
     """Creates a dictionary with the quartile ranges and its label in the plot
@@ -93,10 +96,10 @@ def make_quartiles(dist_mat):
     except ValueError, e:
         lq = mq = uq = 0
     # Crate and return the dictionary with the quartiles ranges
-    return {(min_val - .01, lq):(1, "(0-25%)\nLower\nquartile"),
-            (lq, mq):(2.0, "(25-50%)"),
-            (mq, uq):(3.0, "(50-75%)"),
-            (uq, max_val + .01):(4.0,"(75-100%)\nUpper\nquartile")}
+    return {(min_val - .01, lq): (1, "(0-25%)\nLower\nquartile"),
+            (lq, mq): (2.0, "(25-50%)"),
+            (mq, uq): (3.0, "(50-75%)"),
+            (uq, max_val + .01): (4.0, "(75-100%)\nUpper\nquartile")}
 
 
 def generate_trans_values_dict(dist_mat):
@@ -113,6 +116,7 @@ def generate_trans_values_dict(dist_mat):
     trans_values = make_quartiles(dist_mat)
     trans_values[(None, None)] = (0, "")
     return trans_values
+
 
 def generate_data_make_html(dm_lines):
     """Generates a dictionary from the distance matrix with the plot info
@@ -150,6 +154,7 @@ def generate_data_make_html(dm_lines):
     result[LD_TABLE_TITLE] = "Distance matrix"
 
     return result
+
 
 def make_distance_matrix_heatmap(dm_lines, mapping_lines, html_fp, output_dir):
     """Create an html with a heatmap of the distance matrix

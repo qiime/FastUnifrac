@@ -21,7 +21,7 @@ script_info['script_description'] = """Takes a beta significance each sample\
  individually test output file (file output of beta_significance.py) and\
  generates a html file containing a table showing the results."""
 script_info['script_usage'] = [
-    ("Example", "Generate a html file named 'index.html' with a table showing "+
+    ("Example", "Generate a html file named 'index.html' with a table showing " +
         "the beta significance test results represented in 'beta_output.txt'",
         "%prog -i beta_output.txt -o index.html")
 ]

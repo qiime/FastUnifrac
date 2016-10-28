@@ -9,6 +9,7 @@ __maintainer__ = "Jose Antonio Navas Molina"
 __email__ = "josenavasmolina@gmail.com"
 __status__ = "Development"
 
+
 def parse_jackknife_support_file(lines):
     """Parses the jackknife support file
 
@@ -36,6 +37,7 @@ def parse_jackknife_support_file(lines):
     result['support_dict'] = dict_support
     return result
 
+
 def parse_beta_significance_output_pairwise(lines):
     """Parses the pairwise beta significance output file
 
@@ -51,9 +53,9 @@ def parse_beta_significance_output_pairwise(lines):
         the headers, which should be 'sample 1', 'sample 2', 'p value', 'p value
         (Bonferroni corrected)'. Thus, we start parsing the values on third row.
     """
-    #Get comment line
+    # Get comment line
     comment = lines.next()
-    #Pass header line
+    # Pass header line
     lines.next()
     result = {}
     for line in lines:
@@ -67,6 +69,7 @@ def parse_beta_significance_output_pairwise(lines):
     test_name = str(comment[1:])
     test_name = test_name.replace("\n", "")
     return result, test_name
+
 
 def parse_beta_significance_output_each_sample(lines):
     """Parses the each sample beta significance output file
@@ -83,9 +86,9 @@ def parse_beta_significance_output_each_sample(lines):
         the headers, which should be 'sample', 'p value', 'p value (Bonferroni
         corrected)'. Thus, we start parsing the values on the third row.
     """
-    #Get comment line
+    # Get comment line
     comment = lines.next()
-    #Pass header line
+    # Pass header line
     lines.next()
     result = {}
     for line in lines:
