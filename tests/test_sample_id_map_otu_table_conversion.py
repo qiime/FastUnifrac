@@ -84,14 +84,14 @@ class SampleIdMapOtuTableConversionTests(TestCase):
         exp = Table(array([[3.,0.,2.],[1.,2.,0.]]),
                     ['OTU1','OTU2'],
                     ['sample1','sample2','sample3'])
-        self.assertEqual(actual.sortBySampleId(), exp.sortBySampleId())
+        self.assertEqual(actual.sort(), exp.sort())
 
         lines = self.SampleMappingNoMIENS
         actual = sample_mapping_to_biom_table(lines)
         exp = Table(array([[3.,0.,2.],[1.,2.,0.]]),
                     ['OTU1','OTU2'],
                     ['sample.1','sample.2','sample.3'])
-        self.assertEqual(actual.sortBySampleId(), exp.sortBySampleId())
+        self.assertEqual(actual.sort(), exp.sort())
 
 if __name__ =='__main__':
     main()

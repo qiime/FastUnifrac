@@ -15,6 +15,7 @@ install:
   # when intalling scikit-bio
   - travis_retry conda create --yes -n fastunifrac python=2.7 qiime matplotlib=1.4.3 mock nose -c bioconda
   - source activate fastunifrac
+  - conda install flake8
   - travis_retry pip install . --process-dependency-links
 script:
   - nosetests --with-doctest --with-coverage -v --cover-package=fastunifrac
